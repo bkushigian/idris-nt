@@ -5,7 +5,6 @@ plusMonotonic LTEZero LTEZero = LTEZero
 plusMonotonic LTEZero (LTESucc x) = LTEZero
 plusMonotonic (LTESucc x) (LTESucc y) = LTESucc (plusMonotonic x y)
 
-plusStrict
 
 ||| A proof that d divides n, given by providing a k
 ||| such that n = d * k
