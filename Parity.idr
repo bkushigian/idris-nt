@@ -8,9 +8,14 @@ mutual
   data Odd : Nat -> Type where
     SE : Even n -> Odd (S n)
 
+
+data Parity : Nat -> Type where
+  ParOdd  : Odd n  -> Parity n
+  ParEven : Even n -> Parity n
+
 %name Even e
 %name Odd  o
-
+%name Parity p
 
 total
 oddPlusOddEven : Odd n -> Odd m -> Even (n + m)
@@ -44,4 +49,30 @@ predOddEven (SE e) = e
 total
 predNonZeroEvenOdd : Even (S n) -> Odd n
 predNonZeroEvenOdd (SO o) = o
+
+total
+oneNotEven : Even (S Z) -> Void
+oneNotEven (SO (SE _)) impossible
+
+total
+oddNotEven : {x:Nat} -> Odd x -> Even x -> Void
+oddNotEven (SE ZE) (SO (SE _)) impossible
+oddNotEven (SE (SO o)) (SO (SE e)) = oddNotEven o e
+
+total
+evenNotOdd : {x:Nat} -> Even x -> Odd x -> Void
+evenNotOdd e o = oddNotEven o e
+
+total
+getParity : (n : Nat) -> Parity n
+getParity Z = ParEven ZE
+getParity (S k) = case getParity k of
+                       (ParOdd o) => ParEven (SO o)
+                       (ParEven e) => ParOdd (SE e)
+
+total
+evenOrOdd : {x : Nat} -> (Even x -> Void) -> (Odd x -> Void) -> Void
+evenOrOdd {x} evenContra oddContra = (case getParity x of
+          (ParOdd o) => oddContra o
+          (ParEven e) => evenContra e)
 
