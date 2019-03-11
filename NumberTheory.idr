@@ -1,4 +1,5 @@
 module NumberTheory
+import Parity
 
 public export data GCD : Nat -> Nat -> Nat -> Type where
   AllDivZ : (d : Nat) -> GCD 0 d d
@@ -11,28 +12,6 @@ public export data Coprime : (a : Nat) -> (b : Nat) -> Type where
 public export
 data Prime : Nat -> Type where
   P2 : Prime 2
-
--------------------------------------------------------------------------------
---                                   Parity                                  --
--------------------------------------------------------------------------------
-mutual
-  public export
-  data Even : Nat -> Type where
-    ZE : Even Z
-    SO : Odd n -> Even (S n)
-
-  public export
-  data Odd : Nat -> Type where
-    SE : Even n -> Odd (S n)
-
-public export
-data Parity : Nat -> Type where
-  ParOdd  : Odd n  -> Parity n
-  ParEven : Even n -> Parity n
-
-%name Even e
-%name Odd  o
-%name Parity p
 
 ||| Prove that plus is monotonic WRT the LTE relation
 public export
