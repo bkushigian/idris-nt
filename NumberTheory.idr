@@ -12,37 +12,9 @@ public export
 data Prime : Nat -> Type where
   P2 : Prime 2
 
-public export
-data Q : Type where
-  Quot : (a : Nat) -> (b : Nat) -> GT b 0 -> Q
-
-total
-qplus : Q -> Q -> Q
-qplus (Quot a b bNot0) (Quot c d dNot0) = ?qplus_rhs_2
-
-total
-qmult : Q -> Q -> Q
-qmult (Quot a b x) (Quot c d y) = Quot (a * c) (b * d) ?prf1
-
-total
-qFromNat : Nat -> Q
-qFromNat k = Quot k 1 (LTESucc LTEZero)
-
-Num Q where
-  (+) = qplus
-  (*) = qmult
-  fromInteger = qFromNat . fromInteger
-
-||| A proof that d divides n, given by providing a k such that n = d * k
-public export
-data Divides : (d : Nat) -> (n : Nat) -> Type where
-  Div : (d : Nat) -> (k : Nat) -> Divides d (d * k)
-
-||| A proof that d doesn't divide n
-public export
-data NDivides : (d : Nat) -> (n : Nat) -> Type where
-  NDiv : (Divides d n -> Void) -> NDivides d n
-
+-------------------------------------------------------------------------------
+--                                   Parity                                  --
+-------------------------------------------------------------------------------
 mutual
   public export
   data Even : Nat -> Type where
@@ -87,3 +59,61 @@ multMonotonic {a=S left} {b=S right} k (LTESucc x) = plusMonotonic k (multMonoto
 --                  -> Divides k n
 --                  -> Void
 -- numAndSuccDontDiv {d} {k} {n = (S right)} (LTESucc dkLTn) n_lt_dSk kDn = ?numAndSuccDontDiv_rhs_1
+
+-------------------------------------------------------------------------------
+--                                Divisibility                               --
+-------------------------------------------------------------------------------
+||| A proof that d divides n, given by providing a k such that n = d * k
+public export
+data Divides : (d : Nat) -> (n : Nat) -> Type where
+  Div : (d : Nat) -> (k : Nat) -> Divides d (d * k)
+
+||| A proof that d doesn't divide n
+public export
+data NDivides : (d : Nat) -> (n : Nat) -> Type where
+  NDiv : (Divides d n -> Void) -> NDivides d n
+
+oneDividesN : (n : Nat) -> Divides 1 n
+oneDividesN Z = Div 1 Z
+oneDividesN (S k) = case oneDividesN k of Div (S Z) k => Div (S Z) (S k)
+
+total
+plusSRight : (m : Nat) -> (n : Nat) -> plus m (S n) = S (plus m n)
+plusSRight Z n = Refl
+plusSRight (S k) n = case plusSRight k n of prf  => cong prf
+
+total
+plusReducesS : (m : Nat) -> (n : Nat) -> S (plus m n) = plus m (S n)
+plusReducesS Z n = Refl
+plusReducesS (S k) n = cong (plusReducesS k n)
+
+total
+twoDividesEven : {n : Nat} -> Even n -> Divides 2 n
+twoDividesEven ZE = Div 2 0
+twoDividesEven {n = (S (S _))} (SO (SE e)) = case twoDividesEven e of
+                            (Div _ k) => rewrite plusReducesS k (plus k 0) in Div 2 (S k)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
