@@ -1,21 +1,30 @@
 ||| Proofs from Landau's "Foundations of Analysis", this builds up analysis
 ||| axiomatically starting at "Naturals" (here, Landau starts at one instead of
-||| zero). We define PNat, the positive nat
+||| zero, so we have to define PNat, the type of positive natural numbers).
 module Landau
-
-{-
-axiom 1: one is a natural number
-
-axiom 2: for each x there exists exactly one natural number, called the
-         successor of x, which we denote by N x
--}
-
 %access public export
 %default total
 
 -------------------------------------------------------------------------------
 ---                             Define PNat                                 ---
 -------------------------------------------------------------------------------
+
+{-
+  Landau starts off with four axioms by which he derives all of his theorems.
+
+  axiom 1: one is a natural number
+
+  axiom 2: for each x there exists exactly one natural number, called the
+           successor of x, which we denote by N x
+
+  axiom3: 1 is not the successor of any number
+
+  axiom4: If x' = y' then x = y
+
+  These are all handled by the type-theoretic definition of PNat, but we do
+  prove axioms 3 and 4 explicitly.
+-}
+
 ||| PNat is a positive natural number (one or greater). The definition is
 ||| the same as that of Nat.
 data PNat : Type where
