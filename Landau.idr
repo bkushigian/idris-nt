@@ -228,10 +228,17 @@ plusRightImpliesNotPlusLeft x y u v prf1 prf2 =
   let prf8 : ((v + u) + y = y) = transL prf7 $ plusCommutative y (v + u) in
   theorem7 (v + u) y prf8
 
---- TODO: implement `exclusive or` to replace with Either
----theorem9 : (x, y : PNat) -> Either (x = y) (ExistsUnique (\u => Either (x = y + u) (y = x + u)))
----theorem9 x y = if x == y then Left (x == y) else
----               ?hole
+theorem9Part1 : (x, y : PNat) -> Either (x = y) (Exists (\u => ExclusiveOr (x = y + u) (x + u = y)))
+theorem9Part1 x y = if x == y then Left Refl else
+                    Right $ theorem9Part1Part2 x y Refl
+
+theorem9Part1Part2 : (x, y : PNat) -> x = y -> ((Exists (\u => ExclusiveOr (x = y + u) (x + u = y))) -> Void)
+theorem9Part1Part2 x y prf = \prfEx => case getWitness $ getProof prfEx of
+                                         Left prf => equalsImpliesNotPlusLeft x y u prf
+                                         Right prf => equalsImpliesNotPlusRight x y u prf
+
+--theorem9 : (x, y : PNat) -> ExclusiveOr (x = y) (Exists (\u => ExclusiveOr (x = y + u) (x + u = y)))
+--theorem9 x y = ExclusivePf (theorem9Part1 x y) (theorem9Part2 x y) (theorem9Part3 x y)
 
 
 
