@@ -180,10 +180,10 @@ theorem7 (N _) O Refl impossible
 theorem7 x (N j) prf = let inductiveHypothesis = theorem7 x j in
                                inductiveHypothesis $ thm7Helper x j prf
 
-theorem8 : (x, y, z : PNat) -> (y = z -> Void) -> (x + y = x + z -> Void)
-theorem8 O y z prf1 = \prf2 => prf1 $ axiom4 y z prf2
-theorem8 (N j) y z prf1 = let inductiveHypothesis = theorem8 j y z prf1 in
-                          \prf2 => let prf3 = axiom4 (j + y) (j + z) prf2 in
+theorem8 : (x, y, z : PNat) -> (y = z -> Void) -> x + y = x + z -> Void
+theorem8 O y z contra prf =  contra $ axiom4 y z prf
+theorem8 (N j) y z contra prf = let inductiveHypothesis = theorem8 j y z contra in
+                          let prf3 = axiom4 (j + y) (j + z) prf in
                                    inductiveHypothesis prf3
 
 --- TODO: implement `exclusive or` to replace with Either
