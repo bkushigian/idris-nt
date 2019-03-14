@@ -29,14 +29,6 @@ import PNat
 ---                               Begin Proofs                               ---
 --------------------------------------------------------------------------------
 
-||| We always have x' != 1
-axiom3 : (x : PNat) -> (N x) = O -> Void
-axiom3 _ Refl impossible
-
-||| If x' = y' then x = y
-axiom4 : (x : PNat) -> (y : PNat) -> N x = N y -> x = y
-axiom4 y y Refl = Refl
-
 ||| If x != y then x' != y'
 theorem1 : (x : PNat) -> (y : PNat) -> (x = y -> Void) -> (N x = N y) -> Void
 theorem1 x y contra prf = contra (axiom4 x y prf)
