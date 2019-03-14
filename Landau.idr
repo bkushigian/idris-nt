@@ -79,6 +79,23 @@ Num PNat where
   (*) = multPNat
   fromInteger = fromIntegerPNat
 
+Abs PNat where
+  abs = id
+
+||| Cast non-positive Integers to one
+Cast Integer PNat where
+  cast = fromInteger
+
+Cast String PNat where
+  cast str = cast (the Integer (cast str))
+
+Cast PNat String where
+  cast n = cast (the Integer (cast n))
+
+Show PNat where
+  show n = show (the Integer (cast n))
+  showPrec d n = show n
+
 isOne : PNat -> Bool
 isOne O = True
 isOne (N _) = False
@@ -217,4 +234,7 @@ Ord PNat where
   compare O (N x)     = LT
   compare (N x) O     = GT
   compare (N x) (N y) = compare x y
+
+MinBound PNat where
+  minBound = O
 
