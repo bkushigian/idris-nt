@@ -74,6 +74,12 @@ Uninhabited (O = N n) where
 Uninhabited (N n = O) where
   uninhabited Refl impossible
 
+Uninhabited (N n = n) where
+  uninhabited Refl impossible
+
+Uninhabited (n = N n) where
+  uninhabited Refl impossible
+
 Num PNat where
   (+) = plusPNat
   (*) = multPNat
@@ -83,16 +89,16 @@ Abs PNat where
   abs = id
 
 ||| Cast non-positive Integers to one
-Cast Integer PNat where
+implementation Cast Integer PNat where
   cast = fromInteger
 
-Cast String PNat where
+implementation Cast String PNat where
   cast str = cast (the Integer (cast str))
 
-Cast PNat String where
+implementation Cast PNat String where
   cast n = cast (the Integer (cast n))
 
-Show PNat where
+implementation Show PNat where
   show n = show (the Integer (cast n))
   showPrec d n = show n
 
@@ -161,16 +167,16 @@ plusOneRightNext O = Refl
 plusOneRightNext (N i) = let inductiveHypothesis = plusOneRightNext i in
                              cong inductiveHypothesis 
 
-plusBilinearLeft : (x : PNat) -> (y : PNat) -> N (x + y) = N x + y
-plusBilinearLeft O y = Refl
-plusBilinearLeft (N i) y = cong $ plusBilinearLeft i y
+plusEquivariantLeft : (x : PNat) -> (y : PNat) -> N (x + y) = N x + y
+plusEquivariantLeft O y = Refl
+plusEquivariantLeft (N i) y = cong $ plusEquivariantLeft i y
 
-plusBilinearRight : (x : PNat) -> (y : PNat) -> N (x + y) = x + N y
-plusBilinearRight O y = Refl
-plusBilinearRight (N i) y = cong $ plusBilinearRight i y
+plusEquivariantRight : (x : PNat) -> (y : PNat) -> N (x + y) = x + N y
+plusEquivariantRight O y = Refl
+plusEquivariantRight (N i) y = cong $ plusEquivariantRight i y
 
 thm6Helper : (x : PNat) -> (y : PNat) -> x + N y = N (x + y)
-thm6Helper x y = rewrite plusBilinearRight x y in Refl
+thm6Helper x y = rewrite plusEquivariantRight x y in Refl
 
 theorem6 : (x : PNat) -> (y : PNat) -> x + y = y + x
 theorem6 O y = rewrite plusOneRightNext y in Refl
@@ -182,7 +188,7 @@ plusCommutative : (x : PNat) -> (y : PNat) -> x + y = y + x
 plusCommutative = theorem6
 
 thm7Helper : (x : PNat) -> (y : PNat) -> x + (N y) = N y -> x + y = y
-thm7Helper x y prf = axiom4 (x + y) y $ replace prf $ plusBilinearRight x y
+thm7Helper x y prf = axiom4 (x + y) y $ replace prf $ plusEquivariantRight x y
 
 theorem7 : (x : PNat) -> (y : PNat) -> x + y = y -> Void
 theorem7 O _ Refl impossible
@@ -196,11 +202,14 @@ theorem8 (N j) y z contra prf = let inductiveHypothesis = theorem8 j y z contra 
                           let prf3 = axiom4 (j + y) (j + z) prf in
                                    inductiveHypothesis prf3
 
-equalsImpliesNotPlusRight : (x, y : PNat) -> x = y -> (v : PNat) -> x = y + v -> Void
+equalsImpliesNotPlusRight : {x, y : PNat} -> x = y -> (v : PNat) -> x = y + v -> Void
+equalsImpliesNotPlusRight {x = y} {y = y} Refl v prf1 = theorem7 v y (rewrite plusCommutative v y in rewrite prf1 in Refl)
 
 equalsImpliesNotPlusLeft : (x, y : PNat) -> x = y -> (u : PNat) -> x + u = y -> Void
+equalsImpliesNotPlusLeft y y Refl u prf1 = equalsImpliesNotPlusRight {x=y} {y=y} Refl u (rewrite prf1 in Refl)
 
 plusLeftImpliesNotEqual : (x, y, u : PNat) -> x + u = y -> x = y -> Void
+plusLeftImpliesNotEqual x y u prf prf1 = ?plusLeftImpliesNotEqual_rhs
 
 plusLeftImpliesNotPlusRight : (x, y, u, v: PNat) -> x + u = y -> x = y + v -> Void
 
