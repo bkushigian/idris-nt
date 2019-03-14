@@ -13,6 +13,13 @@ data PNat : Type where
 
 %name PNat i, j, k, m, n
 
+||| We always have x' != 1
+axiom3 : (x : PNat) -> (N x) = O -> Void
+axiom3 _ Refl impossible
+
+||| If x' = y' then x = y
+axiom4 : (x : PNat) -> (y : PNat) -> N x = N y -> x = y
+axiom4 y y Refl = Refl
 
 Eq PNat where
   O == O         = True
@@ -94,4 +101,16 @@ Uninhabited (IsNext O) where
 isItNext : (n : PNat) -> Dec (IsNext n)
 isItNext O = No absurd
 isItNext (N i) = Yes ItIsNext
+
+
+OnotN : O = N n -> Void
+OnotN Refl impossible
+
+implementation DecEq PNat where
+  decEq O     O     =   Yes Refl
+  decEq O     (N _) =   No OnotN
+  decEq (N _) O     =   No (negEqSym OnotN)
+  decEq (N n) (N m) with (decEq n m)
+    | Yes p = Yes $ cong p
+    | No p = No $ \h : (N n = N m) => p $ axiom4 n m h
 
