@@ -14,7 +14,7 @@ using (a : Type, P : a -> Type)
     getProof : (eu : ExistsUnique {a} P) -> P (getWitness eu)
     getProof (EvidenceEq x pf pfEq) = pf
     
-    getPfEq : (eu : ExistsUnique {a} P) -> (y : a) -> (pfv : P y) -> getWitness eu = y
+    getPfEq : (eu : ExistsUnique {a} P) -> ((y : a) -> (pfv : P y) -> getWitness eu = y)
     getPfEq (EvidenceEq x pf pfEq) = pfEq
     
 
