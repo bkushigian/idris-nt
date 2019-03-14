@@ -217,8 +217,6 @@ equalsImpliesNotPlusLeft y y Refl u prf1 = equalsImpliesNotPlusRight {x=y} {y=y}
 plusLeftImpliesNotEqual : (x, y, u : PNat) -> x + u = y -> x = y -> Void
 plusLeftImpliesNotEqual x y u prf prf1 = equalsImpliesNotPlusLeft x y prf1 u prf
 
-plusLeftImpliesNotPlusRight : (x, y, u, v: PNat) -> x + u = y -> x = y + v -> Void
-
 plusRightImpliesNotEqual : (x, y, v : PNat) -> x = y + v -> x = y -> Void
 plusRightImpliesNotEqual x y v prf1 prf2 =
   let prf3 : (y + v = y) = trans (sym prf1) prf2 in
@@ -234,6 +232,9 @@ plusRightImpliesNotPlusLeft x y u v prf1 prf2 =
   let prf7 : (y + (v + u) = y) = transL prf6 $ plusAssociative y v u in
   let prf8 : ((v + u) + y = y) = transL prf7 $ plusCommutative y (v + u) in
   theorem7 (v + u) y prf8
+
+plusLeftImpliesNotPlusRight : (x, y, u, v: PNat) -> x + u = y -> x = y + v -> Void
+plusLeftImpliesNotPlusRight x y u v prf prf1 = plusRightImpliesNotPlusLeft x y u v prf1 prf
 
 --- TODO: implement `exclusive or` to replace with Either
 ---theorem9 : (x, y : PNat) -> Either (x = y) (ExistsUnique (\u => Either (x = y + u) (y = x + u)))
