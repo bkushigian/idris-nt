@@ -79,6 +79,23 @@ Num PNat where
   (*) = multPNat
   fromInteger = fromIntegerPNat
 
+Abs PNat where
+  abs = id
+
+||| Cast non-positive Integers to one
+Cast Integer PNat where
+  cast = fromInteger
+
+Cast String PNat where
+  cast str = cast (the Integer (cast str))
+
+Cast PNat String where
+  cast n = cast (the Integer (cast n))
+
+Show PNat where
+  show n = show (the Integer (cast n))
+  showPrec d n = show n
+
 isOne : PNat -> Bool
 isOne O = True
 isOne (N _) = False
@@ -97,8 +114,9 @@ isItNext : (n : PNat) -> Dec (IsNext n)
 isItNext O = No absurd
 isItNext (N i) = Yes ItIsNext
 
-axiom2 : (x : PNat) -> (y : PNat) -> x = y -> N x = N y
-axiom2 x y prf = cong prf
+--------------------------------------------------------------------------------
+---                               Begin Proofs                               ---
+--------------------------------------------------------------------------------
 
 ||| We always have x' != 1
 axiom3 : (x : PNat) -> (N x) = O -> Void
@@ -124,14 +142,6 @@ theorem3 (N i) contra = (i ** Refl)
 ||| exactly one way a natural number, called x + y, such that
 |||   1. 1 + y = y'
 |||   2. x' + y = (x + y)'
-||| Here we don't construct the uniqueness proof, but rather only the existence
-||| of the function
----theorem4 : (x : PNat) -> (y : PNat) -> PNat
----theorem4 = plusPNat
-
----thm4Uniqueness : {x, y, a, b : PNat} -> (a = x + y) -> (b = x + y) -> (a = b)
----thm4Uniqueness aEq bEq = trans aEq $ sym bEq
-
 theorem4 : (x, y : PNat) -> ExistsUnique (\a => a = x + y)
 theorem4 x y = let u : PNat = x + y in
                let pf : (u = x + y) = Refl in
@@ -237,4 +247,7 @@ Ord PNat where
   compare O (N x)     = LT
   compare (N x) O     = GT
   compare (N x) (N y) = compare x y
+
+MinBound PNat where
+  minBound = O
 
