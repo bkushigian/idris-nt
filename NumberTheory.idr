@@ -28,9 +28,8 @@ plusMonotonic (S k) x = LTESucc (plusMonotonic k x)
 
 total public export
 multMonotonic : {a : Nat} -> {b : Nat} -> (c : Nat) -> (LTE a b) -> LTE (a * c) (b * c)
-multMonotonic {a} {b} Z x = rewrite multCommutative a 0 in rewrite multCommutative b 0 in LTEZero
-multMonotonic (S k) LTEZero = LTEZero
-multMonotonic {a=S left} {b=S right} k (LTESucc x) = plusMonotonic k (multMonotonic k x)
+multMonotonic c LTEZero = LTEZero
+multMonotonic c (LTESucc x) = plusMonotonic c (multMonotonic c x)
 
 -- numAndSuccDontDiv : {d : Nat} -> {k : Nat} -> {n : Nat}
 --                  -> LT (d * k) n
@@ -93,6 +92,5 @@ twoDividesEven {n = (S (S _))} (SO (SE e)) = case twoDividesEven e of
 
 
 
-
-
-
+ 
+ 

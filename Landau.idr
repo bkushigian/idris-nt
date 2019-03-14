@@ -2,6 +2,9 @@
 ||| axiomatically starting at "Naturals" (here, Landau starts at one instead of
 ||| zero, so we have to define PNat, the type of positive natural numbers).
 module Landau
+
+import Logic
+
 %access public export
 %default total
 
@@ -94,6 +97,9 @@ isItNext : (n : PNat) -> Dec (IsNext n)
 isItNext O = No absurd
 isItNext (N i) = Yes ItIsNext
 
+axiom2 : (x : PNat) -> (y : PNat) -> x = y -> N x = N y
+axiom2 x y prf = cong prf
+
 ||| We always have x' != 1
 axiom3 : (x : PNat) -> (N x) = O -> Void
 axiom3 _ Refl impossible
@@ -120,8 +126,17 @@ theorem3 (N i) contra = (i ** Refl)
 |||   2. x' + y = (x + y)'
 ||| Here we don't construct the uniqueness proof, but rather only the existence
 ||| of the function
-theorem4 : (x : PNat) -> (y : PNat) -> PNat
-theorem4 = plusPNat
+---theorem4 : (x : PNat) -> (y : PNat) -> PNat
+---theorem4 = plusPNat
+
+---thm4Uniqueness : {x, y, a, b : PNat} -> (a = x + y) -> (b = x + y) -> (a = b)
+---thm4Uniqueness aEq bEq = trans aEq $ sym bEq
+
+theorem4 : (x, y : PNat) -> ExistsUnique (\a => a = x + y)
+theorem4 x y = let u : PNat = x + y in
+               let pf : (u = x + y) = Refl in
+               let pfEq : ((v : PNat) -> (v = x + y) -> (u = v)) = \v, pfv => trans pf $ sym pfv in
+               EvidenceEq u pf pfEq
 
 theorem5 : (x : PNat) -> (y : PNat) -> (z : PNat) -> (x + y) + z = x + (y + z)
 theorem5 O y z = Refl
@@ -157,13 +172,26 @@ plusCommutative : (x : PNat) -> (y : PNat) -> x + y = y + x
 plusCommutative = theorem6
 
 thm7Helper : (x : PNat) -> (y : PNat) -> x + (N y) = N y -> x + y = y
-thm7Helper x y prf = ?thm7Helper_rhs1
+thm7Helper x y prf = axiom4 (x + y) y $ replace prf $ plusBilinearRight x y
 
 theorem7 : (x : PNat) -> (y : PNat) -> x + y = y -> Void
 theorem7 O _ Refl impossible
 theorem7 (N _) O Refl impossible
 theorem7 x (N j) prf = let inductiveHypothesis = theorem7 x j in
-                               inductiveHypothesis ?theorem7_rhs_3
+                               inductiveHypothesis $ thm7Helper x j prf
+
+theorem8 : (x, y, z : PNat) -> (y = z -> Void) -> (x + y = x + z -> Void)
+theorem8 O y z prf1 = \prf2 => prf1 $ axiom4 y z prf2
+theorem8 (N j) y z prf1 = let inductiveHypothesis = theorem8 j y z prf1 in
+                          \prf2 => let prf3 = axiom4 (j + y) (j + z) prf2 in
+                                   inductiveHypothesis prf3
+
+--- TODO: implement `exclusive or` to replace with Either
+---theorem9 : (x, y : PNat) -> Either (x = y) (ExistsUnique (\u => Either (x = y + u) (y = x + u)))
+---theorem9 x y = if x == y then Left (x == y) else
+---               ?hole
+
+
 
 
 
