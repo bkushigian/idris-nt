@@ -215,7 +215,7 @@ equalsImpliesNotPlusLeft : (x, y : PNat) -> x = y -> (u : PNat) -> x + u = y -> 
 equalsImpliesNotPlusLeft y y Refl u prf1 = equalsImpliesNotPlusRight {x=y} {y=y} Refl u (rewrite prf1 in Refl)
 
 plusLeftImpliesNotEqual : (x, y, u : PNat) -> x + u = y -> x = y -> Void
-plusLeftImpliesNotEqual x y u prf prf1 = ?plusLeftImpliesNotEqual_rhs
+plusLeftImpliesNotEqual x y u prf prf1 = equalsImpliesNotPlusLeft x y prf1 u prf
 
 plusLeftImpliesNotPlusRight : (x, y, u, v: PNat) -> x + u = y -> x = y + v -> Void
 
