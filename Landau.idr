@@ -214,8 +214,20 @@ plusLeftImpliesNotEqual x y u prf prf1 = ?plusLeftImpliesNotEqual_rhs
 plusLeftImpliesNotPlusRight : (x, y, u, v: PNat) -> x + u = y -> x = y + v -> Void
 
 plusRightImpliesNotEqual : (x, y, v : PNat) -> x = y + v -> x = y -> Void
+plusRightImpliesNotEqual x y v prf1 prf2 =
+  let prf3 : (y + v = y) = trans (sym prf1) prf2 in
+  let prf4 : (v + y = y) = transL prf3 $ plusCommutative y v in
+  theorem7 v y prf4
 
 plusRightImpliesNotPlusLeft : (x, y, u, v: PNat) -> x = y + v -> x + u = y -> Void
+plusRightImpliesNotPlusLeft x y u v prf1 prf2 =
+  let prf3 : (u + x = u + (y + v)) = addXToBothSides u x (y + v) prf1 in
+  let prf4 : (x + u = u + (y + v)) = transL prf3 $ plusCommutative u x in
+  let prf5 : (u + (y + v) = y) = transL prf2 prf4 in
+  let prf6 : ((y + v) + u = y) = transL prf5 $ plusCommutative u (y + v) in
+  let prf7 : (y + (v + u) = y) = transL prf6 $ plusAssociative y v u in
+  let prf8 : ((v + u) + y = y) = transL prf7 $ plusCommutative y (v + u) in
+  theorem7 (v + u) y prf8
 
 --- TODO: implement `exclusive or` to replace with Either
 ---theorem9 : (x, y : PNat) -> Either (x = y) (ExistsUnique (\u => Either (x = y + u) (y = x + u)))
