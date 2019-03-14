@@ -11,12 +11,11 @@ using (a : Type, P : a -> Type)
     getWitness : ExistsUnique {a} P -> a
     getWitness (EvidenceEq x pf pfEq) = x
 
-    getProof : (x : ExistsUnique {a} P) -> P (getWitness x)
+    getProof : (eu : ExistsUnique {a} P) -> P (getWitness eu)
     getProof (EvidenceEq x pf pfEq) = pf
     
-    --- TODO: Fix
-    ---getPfEq : (x : ExistsUnique {a} P) -> ((y : a) -> (pfv : P y) -> x = y)
-    ---getPfEq (EvidenceEq x pf pfEq) = pfEq
+    getPfEq : (eu : ExistsUnique {a} P) -> (y : a) -> (pfv : P y) -> getWitness eu = y
+    getPfEq (EvidenceEq x pf pfEq) = pfEq
     
 
 public export
