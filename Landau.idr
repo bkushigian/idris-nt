@@ -205,6 +205,12 @@ theorem8 (N j) y z contra prf = let inductiveHypothesis = theorem8 j y z contra 
 equalsImpliesNotPlusRight : {x, y : PNat} -> x = y -> (v : PNat) -> x = y + v -> Void
 equalsImpliesNotPlusRight {x = y} {y = y} Refl v prf1 = theorem7 v y (rewrite plusCommutative v y in rewrite prf1 in Refl)
 
+addXToBothSides : (x, y, z : PNat) -> y = z -> x + y = x + z
+addXToBothSides x y z prf = cong prf
+
+transL : a = b -> a = c -> c = b
+transL prf1 prf2 = trans (sym prf2) prf1
+
 equalsImpliesNotPlusLeft : (x, y : PNat) -> x = y -> (u : PNat) -> x + u = y -> Void
 equalsImpliesNotPlusLeft y y Refl u prf1 = equalsImpliesNotPlusRight {x=y} {y=y} Refl u (rewrite prf1 in Refl)
 
