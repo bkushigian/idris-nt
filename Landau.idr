@@ -186,6 +186,18 @@ theorem8 (N j) y z contra prf = let inductiveHypothesis = theorem8 j y z contra 
                           let prf3 = axiom4 (j + y) (j + z) prf in
                                    inductiveHypothesis prf3
 
+equalsImpliesNotPlusRight : (x, y : PNat) -> x = y -> (v : PNat) -> x = y + v -> Void
+
+equalsImpliesNotPlusLeft : (x, y : PNat) -> x = y -> (u : PNat) -> x + u = y -> Void
+
+plusLeftImpliesNotEqual : (x, y, u : PNat) -> x + u = y -> x = y -> Void
+
+plusLeftImpliesNotPlusRight : (x, y, u, v: PNat) -> x + u = y -> x = y + v -> Void
+
+plusRightImpliesNotEqual : (x, y, v : PNat) -> x = y + v -> x = y -> Void
+
+plusRightImpliesNotPlusLeft : (x, y, u, v: PNat) -> x = y + v -> x + u = y -> Void
+
 --- TODO: implement `exclusive or` to replace with Either
 ---theorem9 : (x, y : PNat) -> Either (x = y) (ExistsUnique (\u => Either (x = y + u) (y = x + u)))
 ---theorem9 x y = if x == y then Left (x == y) else
