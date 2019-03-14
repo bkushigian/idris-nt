@@ -9,10 +9,6 @@ import PNat
 %access public export
 %default total
 
--------------------------------------------------------------------------------
----                             Define PNat                                 ---
--------------------------------------------------------------------------------
-
 {-
   Landau starts off with four axioms by which he derives all of his theorems.
 
