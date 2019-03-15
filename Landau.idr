@@ -99,6 +99,8 @@ theorem8 (N j) y z contra prf = let inductiveHypothesis = theorem8 j y z contra 
                           let prf3 = axiom4 (j + y) (j + z) prf in
                                    inductiveHypothesis prf3
 
+{- We break theorem 9 up into a number of subparts. -}
+
 equalsImpliesNotPlusRight : {x, y : PNat} -> x = y -> (v : PNat) -> x = y + v -> Void
 equalsImpliesNotPlusRight {x = y} {y = y} Refl v prf1 = theorem7 v y (rewrite plusCommutative v y in rewrite prf1 in Refl)
 
@@ -130,17 +132,29 @@ plusRightImpliesNotPlusLeft x y u v prf1 prf2 =
   let prf8 : ((v + u) + y = y) = transL prf7 $ plusCommutative y (v + u) in
   theorem7 (v + u) y prf8
 
---theorem9Part1 : (x, y : PNat) -> Either (x = y) (Exists (\u => ExclusiveOr (x = y + u) (x + u = y)))
+theorem9Part1 : (x, y : PNat) -> Either (x = y) (Exists (\u => ExclusiveOr (x = y + u) (x + u = y)))
 --theorem9Part1 x y = if x == y then Left Refl else
 --                    Right $ theorem9Part1Part2 x y Refl
 
---theorem9Part1Part2 : (x, y : PNat) -> x = y -> ((Exists (\u => ExclusiveOr (x = y + u) (x + u = y))) -> Void)
+theorem9Part1Part2 : (x, y : PNat) -> x = y -> ((Exists (\u => ExclusiveOr (x = y + u) (x + u = y))) -> Void)
 --theorem9Part1Part2 x y prf = \prfEx => case getWitness $ getProof prfEx of
 --                                         Left prf => equalsImpliesNotPlusLeft x y u prf
 --                                         Right prf => equalsImpliesNotPlusRight x y u prf
 
---theorem9 : (x, y : PNat) -> ExclusiveOr (x = y) (Exists (\u => ExclusiveOr (x = y + u) (x + u = y)))
+theorem9 : (x, y : PNat) -> ExclusiveOr (x = y) (Exists (\u => ExclusiveOr (x = y + u) (x + u = y)))
 --theorem9 x y = ExclusivePf (theorem9Part1 x y) (theorem9Part2 x y) (theorem9Part3 x y)
+
+||| If x is not y, then either exists u such that x = y + u or exists u such
+||| that x + u = y, but not both
+if_x_not_y : (x, y : PNat) -> (Not (x = y)) -> ExclusiveOr (u ** x = y + u) (u ** x + u = y)
+if_x_not_y x@O y@O contra = let prf_eq : (x = y) = Refl in absurd (contra prf_eq)
+if_x_not_y x@O y@(N i) contra = let prf_plus : (u ** x + u = y) = (_ ** Refl) in 
+                                    ExclusivePf (Right prf_plus) ?prf1
+if_x_not_y (N i) O contra = ?if_x_not_y_rhs_3
+if_x_not_y (N i) (N j) contra = ?if_x_not_y_rhs_4
+
+theorem9' : (x, y : PNat) -> ExclusiveOr (x = y) (ExclusiveOr (u ** x = y + u) (u ** x + u = y))
+theorem9' x y = ?theorem9'_rhs
 
 
 
