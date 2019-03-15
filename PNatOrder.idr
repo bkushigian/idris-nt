@@ -3,6 +3,7 @@ module PNatOrder
 
 import PNat
 import Landau
+import Logic
 
 %access public export
 %default total
@@ -20,21 +21,20 @@ Ord PNat where
 infix 6 .<
 infix 6 .>
 
-data (.>) : PNat -> PNat -> Type where
+data (.>) : (x : PNat) -> (y : PNat) -> Type where
   PlusOnRight : x = y + u -> x .> y
 
-data (.<) : PNat -> PNat -> Type where
+data (.<) : (x : PNat) -> (y : PNat) -> Type where
   PlusOnLeft : x + v = y -> x .< y
-
 
 def2 : x = y + u -> x .> y
 def2 prf = PlusOnRight prf
 
-def3 : y = x + v -> x .< y
+def3 : {v : PNat} -> y = x + v -> x .< y
 def3 prf = PlusOnLeft (sym prf)
 
 ||| For any given x, y, we have exactly one of the cases: x == y, x > y, x < y
-theorem10: (x, y : PNat) -> ?abc
+theorem10 : (x, y : PNat) -> ExactlyOne (x = y) (ExactlyOne (x .> y) (x .< y))
 
 MinBound PNat where
   minBound = O

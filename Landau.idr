@@ -127,13 +127,31 @@ plusRightImpliesNotPlusLeft x y prfEx1 prfEx2 = case (prfEx1, prfEx2) of
     let prf8 : ((v + u) + y = y) = transL prf7 $ plusCommutative y (v + u) in
     theorem7 (v + u) y prf8
 
---theorem9Part1 : (x, y : PNat) -> Either (x = y) 
---                                        (ExactlyOne (Exists (\v => x = y + v)) 
---                                                    (Exists (\u => x + u = y)))
---theorem9Part1 x y = case decideOrder x y of
---  EQ prf => Left prf
---  GT u prf => Right $ ExactlyOnePf (Left (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
---  LT u prf => Right $ ExactlyOnePf (Right (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
+data Order : (x, y : PNat) -> Type where
+  Equal : x = y -> Order x y
+  Less : (u : PNat) -> x + u = y -> Order x y
+  Greater : (v : PNat) -> x = y + v -> Order x y
+
+decideOrder : (x, y : PNat) -> Order x y
+decideOrder O O = Equal Refl
+decideOrder O (N v) = 
+  let p : (O + v = N v) = Refl in
+  Less v p
+decideOrder (N u) O = 
+  let p : (N u = O + u) = Refl in
+  Greater u p
+decideOrder (N x) (N y) = case decideOrder x y of
+  Equal p     => Equal $ cong p
+  Less v p    => Less v $ cong p
+  Greater u p => Greater u $ cong p
+
+theorem9Part1 : (x, y : PNat) -> Either (x = y) 
+                                        (ExactlyOne (Exists (\v => x = y + v)) 
+                                                    (Exists (\u => x + u = y)))
+theorem9Part1 x y = case decideOrder x y of
+  Equal prf => Left prf
+  Less u prf => Right $ ExactlyOnePf (Right (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
+  Greater u prf => Right $ ExactlyOnePf (Left (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
 
 theorem9Part2 : (x, y : PNat) -> x = y -> ExactlyOne (Exists (\v => x = y + v)) 
                                                      (Exists (\u => x + u = y)) ->
@@ -145,11 +163,10 @@ theorem9Part2 x y prf1 prfExactlyOne =
     Right prfExists => case prfExists of
       Evidence u prf2 => equalsImpliesNotPlusLeft x y prf1 u prf2
 
---theorem9 : (x, y : PNat) -> ExactlyOne (x = y)
---                                       (ExactlyOne (Exists (\v => x = y + v))
---                                                   (Exists (\u => x + u = y))))
---theorem9 x y = ExclusivePf (theorem9Part1 x y) (theorem9Part2 x y)
---theorem9 x y = ExclusivePf (theorem9Part1 x y) (theorem9Part2 x y) (theorem9Part3 x y)
+theorem9 : (x, y : PNat) -> ExactlyOne (x = y)
+                                       (ExactlyOne (Exists (\v => x = y + v))
+                                                   (Exists (\u => x + u = y)))
+theorem9 x y = ExactlyOnePf (theorem9Part1 x y) (theorem9Part2 x y)
 
 -- If x is not y, then either exists u such that x = y + u or exists u such
 -- that x + u = y, but not both
