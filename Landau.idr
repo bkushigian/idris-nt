@@ -147,16 +147,3 @@ plusRightImpliesNotPlusLeft x y u v prf1 prf2 =
 
 
 
--------------------------------------------------------------------------------
----                     Chapter 2: Orderings On PNats                       ---
--------------------------------------------------------------------------------
-
-Ord PNat where
-  compare O O         = EQ
-  compare O (N x)     = LT
-  compare (N x) O     = GT
-  compare (N x) (N y) = compare x y
-
-MinBound PNat where
-  minBound = O
-
