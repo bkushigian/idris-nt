@@ -4,13 +4,10 @@
 module Landau
 
 import Logic
+import PNat
 
 %access public export
 %default total
-
--------------------------------------------------------------------------------
----                             Define PNat                                 ---
--------------------------------------------------------------------------------
 
 {-
   Landau starts off with four axioms by which he derives all of his theorems.
@@ -28,109 +25,9 @@ import Logic
   prove axioms 3 and 4 explicitly.
 -}
 
-||| PNat is a positive natural number (one or greater). The definition is
-||| the same as that of Nat.
-data PNat : Type where
-  ||| One
-  O : PNat
-  ||| Successor
-  N : PNat -> PNat
-
-%name PNat i, j, k, m, n
-
-
-Eq PNat where
-  O == O         = True
-  (N l) == (N r) = l == r
-  _ == _         = False
-
-||| Defining addition on PNats here to allow us to inherit the Num
-||| interface and get some nicer syntax.
-plusPNat : (x : PNat) -> (y : PNat) -> PNat
-plusPNat O y = N y
-plusPNat (N i) y = N (plusPNat i y)
-
-||| Defining multiplication on PNats here to allow us to inherit the Num
-||| interface and get some nicer syntax.
-multPNat : (x : PNat) -> (y : PNat) -> PNat
-multPNat O y = y
-multPNat (N i) y = (plusPNat y (multPNat i y))
-
-fromIntegerPNat : Integer -> PNat
-fromIntegerPNat 1 = O
-fromIntegerPNat x = if x > 1 then N (fromIntegerPNat (assert_smaller x (x - 1)))
-                             else O
-
-toIntegerPNat : PNat -> Integer
-toIntegerPNat O = 1
-toIntegerPNat (N i) = 1 + toIntegerPNat i
-
-Cast PNat Integer where
-  cast = toIntegerPNat
-
-Uninhabited (O = N n) where
-  uninhabited Refl impossible
-
-Uninhabited (N n = O) where
-  uninhabited Refl impossible
-
-Uninhabited (N n = n) where
-  uninhabited Refl impossible
-
-Uninhabited (n = N n) where
-  uninhabited Refl impossible
-
-Num PNat where
-  (+) = plusPNat
-  (*) = multPNat
-  fromInteger = fromIntegerPNat
-
-Abs PNat where
-  abs = id
-
-||| Cast non-positive Integers to one
-implementation Cast Integer PNat where
-  cast = fromInteger
-
-implementation Cast String PNat where
-  cast str = cast (the Integer (cast str))
-
-implementation Cast PNat String where
-  cast n = cast (the Integer (cast n))
-
-implementation Show PNat where
-  show n = show (the Integer (cast n))
-  showPrec d n = show n
-
-isOne : PNat -> Bool
-isOne O = True
-isOne (N _) = False
-
-isNext : PNat -> Bool
-isNext = not . isOne
-
-data IsNext : (n : PNat) -> Type where
-  ItIsNext : IsNext (N n)
-
-Uninhabited (IsNext O) where
-  uninhabited ItIsNext impossible
-
-||| A decision procedure for `IsNext'
-isItNext : (n : PNat) -> Dec (IsNext n)
-isItNext O = No absurd
-isItNext (N i) = Yes ItIsNext
-
 --------------------------------------------------------------------------------
 ---                               Begin Proofs                               ---
 --------------------------------------------------------------------------------
-
-||| We always have x' != 1
-axiom3 : (x : PNat) -> (N x) = O -> Void
-axiom3 _ Refl impossible
-
-||| If x' = y' then x = y
-axiom4 : (x : PNat) -> (y : PNat) -> N x = N y -> x = y
-axiom4 y y Refl = Refl
 
 ||| If x != y then x' != y'
 theorem1 : (x : PNat) -> (y : PNat) -> (x = y -> Void) -> (N x = N y) -> Void
@@ -202,7 +99,8 @@ theorem8 (N j) y z contra prf = let inductiveHypothesis = theorem8 j y z contra 
                           let prf3 = axiom4 (j + y) (j + z) prf in
                                    inductiveHypothesis prf3
 
--- Theorem 9 starts here
+{- We break theorem 9 up into a number of subparts. -}
+
 equalsImpliesNotPlusRight : {x, y : PNat} -> x = y -> (v : PNat) -> x = y + v -> Void
 equalsImpliesNotPlusRight {x = y} {y = y} Refl v prf1 =
   theorem7 v y (rewrite plusCommutative v y in rewrite prf1 in Refl)
@@ -229,10 +127,6 @@ plusRightImpliesNotPlusLeft x y prfEx1 prfEx2 = case (prfEx1, prfEx2) of
     let prf8 : ((v + u) + y = y) = transL prf7 $ plusCommutative y (v + u) in
     theorem7 (v + u) y prf8
 
--- TODO
---decideOrder : (x, y : PNat) -> Order x y
---decideOrder x y = case decideEq x y of
-
 --theorem9Part1 : (x, y : PNat) -> Either (x = y) 
 --                                        (ExactlyOne (Exists (\v => x = y + v)) 
 --                                                    (Exists (\u => x + u = y)))
@@ -247,7 +141,7 @@ theorem9Part2 : (x, y : PNat) -> x = y -> ExactlyOne (Exists (\v => x = y + v))
 theorem9Part2 x y prf1 prfExactlyOne =
   case getWitness prfExactlyOne of
     Left prfExists => case prfExists of
-      Evidence u prf2 => equalsImpliesNotPlusRight {x} {y} prf1 u prf2
+      Evidence v prf2 => equalsImpliesNotPlusRight {x} {y} prf1 v prf2
     Right prfExists => case prfExists of
       Evidence u prf2 => equalsImpliesNotPlusLeft x y prf1 u prf2
 
@@ -255,22 +149,13 @@ theorem9Part2 x y prf1 prfExactlyOne =
 --                                       (ExactlyOne (Exists (\v => x = y + v))
 --                                                   (Exists (\u => x + u = y))))
 --theorem9 x y = ExclusivePf (theorem9Part1 x y) (theorem9Part2 x y)
+--theorem9 x y = ExclusivePf (theorem9Part1 x y) (theorem9Part2 x y) (theorem9Part3 x y)
 
-
-
-
-
-
--------------------------------------------------------------------------------
----                     Chapter 2: Orderings On PNats                       ---
--------------------------------------------------------------------------------
-
-Ord PNat where
-  compare O O         = EQ
-  compare O (N x)     = LT
-  compare (N x) O     = GT
-  compare (N x) (N y) = compare x y
-
-MinBound PNat where
-  minBound = O
-
+-- If x is not y, then either exists u such that x = y + u or exists u such
+-- that x + u = y, but not both
+--if_x_not_y : (x, y : PNat) -> (Not (x = y)) -> ExactlyOne (u ** x = y + u) (u ** x + u = y)
+--if_x_not_y x@O y@O contra = let prf_eq : (x = y) = Refl in absurd (contra prf_eq)
+--if_x_not_y x@O y@(N i) contra = let prf_plus : (u ** x + u = y) = (_ ** Refl) in 
+--                                    ExactlyOnePf (Right prf_plus) ?prf1
+--if_x_not_y (N i) O contra = ?if_x_not_y_rhs_3
+--if_x_not_y (N i) (N j) contra = ?if_x_not_y_rhs_4
