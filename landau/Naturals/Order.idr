@@ -94,10 +94,27 @@ x .>= y = N x .> y
 x .<= y = x .< N y
 
 theorem13 : x .>= y -> y .<= x
+theorem13 (PlusOnRight prf) = PlusOnLeft (sym prf)
 
 theorem14 : x .<= y -> y .>= x
+theorem14 (PlusOnLeft prf) = PlusOnRight (sym prf)
 
 theorem15 : x .< y -> y .< z -> x .< z
+theorem15 (PlusOnLeft {v=xy_v} prf_xy) (PlusOnLeft {v=yz_v} prf_yz) =
+    rewrite sym prf_yz in
+    rewrite sym prf_xy in
+    PlusOnLeft {v=xy_v + yz_v} (sym $ plusAssociative x xy_v yz_v)
+
+lessThanTransitive : x .< y -> y .< z -> x .< z
+lessThanTransitive = theorem15
+
+||| This is the preliminary remark given after Theorem 15, since Idris
+||| doesn't have the luxury of "simply reading the formula backwards".
+greatherThanTransitive : x .> y -> y .> z -> x .> z
+greatherThanTransitive xy yz =
+    theorem12 $
+    lessThanTransitive (theorem11 yz) (theorem11 xy)
+
 
 theorem16 : Either (x .<= y, y .< z) (x .< y, y .<= z) -> x .< y
 
