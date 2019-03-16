@@ -57,6 +57,7 @@ mutual
 
 
 theorem11 : x .> y -> y .< x
+theorem11 (PlusOnRight prf) = PlusOnLeft (sym prf)
 
 theorem12 : x .< y -> y .> x
 
@@ -123,4 +124,3 @@ theorem26 : y .< x + y -> y .<= x
 
 MinBound PNat where
   minBound = O
-
