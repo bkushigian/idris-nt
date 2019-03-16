@@ -138,7 +138,7 @@ mutual
   plusRightImpliesNotPlusLeft : (x, y : PNat) -> Exists (\v => x = y + v) ->
                                                  Exists (\u => x + u = y) -> Void
   plusRightImpliesNotPlusLeft x y prfEx1 prfEx2 = case (prfEx1, prfEx2) of
-    (Evidence v prf1, Evidence u prf2) => 
+    (Evidence v prf1, Evidence u prf2) =>
       let prf3 : (u + x = u + (y + v)) = addXToBothSides u x (y + v) prf1 in
       let prf4 : (x + u = u + (y + v)) = transL prf3 $ plusCommutative u x in
       let prf5 : (u + (y + v) = y) = transL prf2 prf4 in
