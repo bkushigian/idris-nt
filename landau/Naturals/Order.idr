@@ -1,8 +1,8 @@
 ||| Chapter 1, Section 2 of Landau, on orderings of naturals
-module PNatOrder
+module Naturals.Order
 
-import PNat
-import Landau
+import Naturals.PNat
+import Naturals.Addition
 import Logic
 
 %access public export

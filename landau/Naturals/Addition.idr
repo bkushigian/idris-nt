@@ -1,10 +1,10 @@
 ||| Proofs from Landau's "Foundations of Analysis", this builds up analysis
 ||| axiomatically starting at "Naturals" (here, Landau starts at one instead of
 ||| zero, so we have to define PNat, the type of positive natural numbers).
-module Landau
+module Naturals.Addition
 
 import Logic
-import PNat
+import Naturals.PNat
 
 %access export
 %default total

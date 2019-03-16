@@ -1,5 +1,4 @@
-module PNat
-
+module Naturals.PNat
 
 %access public export
 %default total
