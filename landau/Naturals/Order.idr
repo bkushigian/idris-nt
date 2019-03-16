@@ -78,6 +78,7 @@ x .>= y = N x .> y
 x .<= y = x .< N y
 
 theorem13 : x .>= y -> y .<= x
+theorem13 (PlusOnRight prf) = PlusOnLeft (sym prf)
 
 theorem14 : x .<= y -> y .>= x
 
