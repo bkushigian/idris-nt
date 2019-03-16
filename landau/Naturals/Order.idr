@@ -77,6 +77,50 @@ x .<= y = x .< N y
 
 theorem13 : x .>= y -> y .<= x
 
+theorem14 : x .<= y -> y .>= x
+
+theorem15 : x .< y -> y .< z -> x .< z
+
+theorem16 : Either (x .<= y, y .< z) (x .< y, y .<= z) -> x .< y
+
+theorem17 : x .<= y -> y .<= z -> x .<= z
+
+theorem18 : x + y .> x
+
+mutual
+    theorem19 : (x .> y -> x + z .> y + z, x = y -> x + z = y + z, x .< y -> x + z .< y + z)
+    theorem19 = (_19a, _19b, _19c)
+
+    _19a : x .> y -> x + z .> y + z
+
+    -- Have to give a type hint here with {x : PNat}
+    _19b : {x : PNat} -> x = y -> x + z = y + z
+
+    _19c : x .< y -> x + z .< y + z
+
+mutual
+    theorem20 : (x + z .> y + z -> x .> y, x + z = y + z -> x = y, x + z .< y + z -> x .< y)
+    theorem20 = (_20a, _20b, _20c)
+
+    _20a : x + z .> y + z -> x .> y
+
+    -- Have to give a type hint here with {x : PNat}
+    _20b : {x : PNat} -> x + z = y + z -> x = y
+
+    _20c : x + z .< y + z -> x .< y
+
+theorem21 : x .> y -> z .> u -> x + z .> y + u
+
+theorem22 : Either (x .>= y, z .> u) (x .> y, z .> u) -> x + z .> y + u
+
+theorem23 : x .>= y -> z .>= u -> x + z .>= y + u
+
+theorem24 : x .>= 1
+
+theorem25 : y .> x -> y .>= x + 1
+
+theorem26 : y .< x + y -> y .<= x
+
 MinBound PNat where
   minBound = O
 
