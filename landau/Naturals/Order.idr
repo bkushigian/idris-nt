@@ -60,6 +60,7 @@ theorem11 : x .> y -> y .< x
 theorem11 (PlusOnRight prf) = PlusOnLeft (sym prf)
 
 theorem12 : x .< y -> y .> x
+theorem12 (PlusOnLeft prf) = PlusOnRight (sym prf)
 
 infix 6 .>=
 infix 6 .<=
