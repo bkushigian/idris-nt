@@ -6,7 +6,7 @@ module Landau
 import Logic
 import PNat
 
-%access public export
+%access export
 %default total
 
 {-
@@ -72,7 +72,7 @@ plusEquivariantRight : (x : PNat) -> (y : PNat) -> N (x + y) = x + N y
 plusEquivariantRight O y = Refl
 plusEquivariantRight (N i) y = cong $ plusEquivariantRight i y
 
-thm6Helper : (x : PNat) -> (y : PNat) -> x + N y = N (x + y)
+private thm6Helper : (x : PNat) -> (y : PNat) -> x + N y = N (x + y)
 thm6Helper x y = rewrite plusEquivariantRight x y in Refl
 
 theorem6 : (x : PNat) -> (y : PNat) -> x + y = y + x
@@ -84,7 +84,7 @@ theorem6 (N i) y = let inductiveHypothesis = theorem6 i y in
 plusCommutative : (x : PNat) -> (y : PNat) -> x + y = y + x
 plusCommutative = theorem6
 
-thm7Helper : (x : PNat) -> (y : PNat) -> x + (N y) = N y -> x + y = y
+private thm7Helper : (x : PNat) -> (y : PNat) -> x + (N y) = N y -> x + y = y
 thm7Helper x y prf = axiom4 (x + y) y $ replace prf $ plusEquivariantRight x y
 
 theorem7 : (x : PNat) -> (y : PNat) -> x + y = y -> Void
@@ -110,25 +110,31 @@ theorem8 (N j) y z contra prf = let inductiveHypothesis = theorem8 j y z contra 
 -}
 
 mutual
+  export
   theorem9 : (x, y : PNat) -> ExactlyOne (x = y)
                                          (ExactlyOne (Exists (\v => x = y + v))
                                                      (Exists (\u => x + u = y)))
   theorem9 x y = ExactlyOnePf (theorem9Part1 x y) (theorem9Part2 x y)
 
+  private
   equalsImpliesNotPlusRight : {x, y : PNat} -> x = y -> (v : PNat) -> x = y + v -> Void
   equalsImpliesNotPlusRight {x = y} {y = y} Refl v prf1 =
     theorem7 v y (rewrite plusCommutative v y in rewrite prf1 in Refl)
 
+  private
   equalsImpliesNotPlusLeft : (x, y : PNat) -> x = y -> (u : PNat) -> x + u = y -> Void
   equalsImpliesNotPlusLeft y y Refl u prf1 =
     equalsImpliesNotPlusRight {x=y} {y=y} Refl u (rewrite prf1 in Refl)
 
+  private
   addXToBothSides : (x, y, z : PNat) -> y = z -> x + y = x + z
   addXToBothSides x y z prf = cong prf
 
+  private
   transL : a = b -> a = c -> c = b
   transL prf1 prf2 = trans (sym prf2) prf1
 
+  private
   plusRightImpliesNotPlusLeft : (x, y : PNat) -> Exists (\v => x = y + v) ->
                                                  Exists (\u => x + u = y) -> Void
   plusRightImpliesNotPlusLeft x y prfEx1 prfEx2 = case (prfEx1, prfEx2) of
@@ -146,6 +152,7 @@ mutual
     Less : (u : PNat) -> x + u = y -> Order x y
     Greater : (v : PNat) -> x = y + v -> Order x y
 
+  private
   getOrder : (x, y : PNat) -> Order x y
   getOrder O O = Equal Refl
   getOrder O (N v) =
@@ -159,6 +166,7 @@ mutual
     Less v p    => Less v $ cong p
     Greater u p => Greater u $ cong p
 
+  private
   theorem9Part1 : (x, y : PNat) -> Either (x = y)
                                           (ExactlyOne (Exists (\v => x = y + v)) 
                                                       (Exists (\u => x + u = y)))
@@ -167,6 +175,7 @@ mutual
     Less u prf => Right $ ExactlyOnePf (Right (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
     Greater u prf => Right $ ExactlyOnePf (Left (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
 
+  private
   theorem9Part2 : (x, y : PNat) -> x = y -> ExactlyOne (Exists (\v => x = y + v)) 
                                                        (Exists (\u => x + u = y)) ->
                                             Void
