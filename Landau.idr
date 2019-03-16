@@ -153,7 +153,7 @@ decideOrder (N x) (N y) = case decideOrder x y of
   Less v p    => Less v $ cong p
   Greater u p => Greater u $ cong p
 
-theorem9Part1 : (x, y : PNat) -> Either (x = y) 
+theorem9Part1 : (x, y : PNat) -> Either (x = y)
                                         (ExactlyOne (Exists (\v => x = y + v)) 
                                                     (Exists (\u => x + u = y)))
 theorem9Part1 x y = case decideOrder x y of
