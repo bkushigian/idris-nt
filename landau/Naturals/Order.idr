@@ -46,14 +46,30 @@ mutual
       -> (x = y -> Not (ExactlyOne (Exists (\v => x = (y + v))) (Exists (\u => (x + u) = y))))
       -> (x = y -> Not (ExactlyOne (x .> y) (x .< y)))  -- Return type
     f' eq f eq2 exactly = case exactly of
-                               (ExactlyOnePf (Left  gt) f1) => let exists = transform_gt gt in ?f'_rhs_1
-                               (ExactlyOnePf (Right lt) f1) => ?f'_rhs_3
+                     (ExactlyOnePf (Left  gt) f1) => let exists = transform_gt gt in 
+                                                     let eith = Left exists in
+                                                     let exactly' = ExactlyOnePf eith cant_plus_both_sides in
+                                                         f eq exactly'
+                     (ExactlyOnePf (Right lt) f1) => let exists = transform_lt lt in
+                                                     let eith = Right exists in
+                                                     let exactly' = ExactlyOnePf eith cant_plus_both_sides in
+                                                         f eq exactly'
 
     transform_gt : x .> y -> Exists (\v => x = y + v)
     transform_gt {x = x} {y = y} (PlusOnRight {u} prf) = Evidence u prf
 
     transform_lt : x .< y -> Exists (\u => x + u = y)
     transform_lt {x = x} {y = y} (PlusOnLeft {v} prf) = Evidence v prf
+
+    cant_plus_both_sides : {x : PNat} -> Exists (\v => x = y + v) -> Not (Exists (\u => x + u = y))
+    cant_plus_both_sides {x} {y} ex1 ex2 =
+      case ex1 of
+            (Evidence v pf_right_plus) => (case ex2 of
+              (Evidence u pf_left_plus) =>
+                  let sub1 : ((y + v) + u = y) = rewrite sym pf_right_plus                 in pf_left_plus in
+                  let sub2 : (y + (v + u) = y) = rewrite sym (plusAssociative y v u)       in sub1         in
+                  let sub3 : ((v + u) + y = y) = rewrite sym (plusCommutative y (v + u))   in sub2         in
+                  theorem7 (v + u) y sub3)
 
 
 theorem11 : x .> y -> y .< x
