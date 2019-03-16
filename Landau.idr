@@ -109,69 +109,71 @@ theorem8 (N j) y z contra prf = let inductiveHypothesis = theorem8 j y z contra 
 
 -}
 
-equalsImpliesNotPlusRight : {x, y : PNat} -> x = y -> (v : PNat) -> x = y + v -> Void
-equalsImpliesNotPlusRight {x = y} {y = y} Refl v prf1 =
-  theorem7 v y (rewrite plusCommutative v y in rewrite prf1 in Refl)
+mutual
+  theorem9 : (x, y : PNat) -> ExactlyOne (x = y)
+                                         (ExactlyOne (Exists (\v => x = y + v))
+                                                     (Exists (\u => x + u = y)))
+  theorem9 x y = ExactlyOnePf (theorem9Part1 x y) (theorem9Part2 x y)
 
-equalsImpliesNotPlusLeft : (x, y : PNat) -> x = y -> (u : PNat) -> x + u = y -> Void
-equalsImpliesNotPlusLeft y y Refl u prf1 =
-  equalsImpliesNotPlusRight {x=y} {y=y} Refl u (rewrite prf1 in Refl)
+  equalsImpliesNotPlusRight : {x, y : PNat} -> x = y -> (v : PNat) -> x = y + v -> Void
+  equalsImpliesNotPlusRight {x = y} {y = y} Refl v prf1 =
+    theorem7 v y (rewrite plusCommutative v y in rewrite prf1 in Refl)
 
-addXToBothSides : (x, y, z : PNat) -> y = z -> x + y = x + z
-addXToBothSides x y z prf = cong prf
+  equalsImpliesNotPlusLeft : (x, y : PNat) -> x = y -> (u : PNat) -> x + u = y -> Void
+  equalsImpliesNotPlusLeft y y Refl u prf1 =
+    equalsImpliesNotPlusRight {x=y} {y=y} Refl u (rewrite prf1 in Refl)
 
-transL : a = b -> a = c -> c = b
-transL prf1 prf2 = trans (sym prf2) prf1
+  addXToBothSides : (x, y, z : PNat) -> y = z -> x + y = x + z
+  addXToBothSides x y z prf = cong prf
 
-plusRightImpliesNotPlusLeft : (x, y : PNat) -> Exists (\v => x = y + v) ->
-                                               Exists (\u => x + u = y) -> Void
-plusRightImpliesNotPlusLeft x y prfEx1 prfEx2 = case (prfEx1, prfEx2) of
-  (Evidence v prf1, Evidence u prf2) => 
-    let prf3 : (u + x = u + (y + v)) = addXToBothSides u x (y + v) prf1 in
-    let prf4 : (x + u = u + (y + v)) = transL prf3 $ plusCommutative u x in
-    let prf5 : (u + (y + v) = y) = transL prf2 prf4 in
-    let prf6 : ((y + v) + u = y) = transL prf5 $ plusCommutative u (y + v) in
-    let prf7 : (y + (v + u) = y) = transL prf6 $ plusAssociative y v u in
-    let prf8 : ((v + u) + y = y) = transL prf7 $ plusCommutative y (v + u) in
-    theorem7 (v + u) y prf8
+  transL : a = b -> a = c -> c = b
+  transL prf1 prf2 = trans (sym prf2) prf1
 
-data Order : (x, y : PNat) -> Type where
-  Equal : x = y -> Order x y
-  Less : (u : PNat) -> x + u = y -> Order x y
-  Greater : (v : PNat) -> x = y + v -> Order x y
+  plusRightImpliesNotPlusLeft : (x, y : PNat) -> Exists (\v => x = y + v) ->
+                                                 Exists (\u => x + u = y) -> Void
+  plusRightImpliesNotPlusLeft x y prfEx1 prfEx2 = case (prfEx1, prfEx2) of
+    (Evidence v prf1, Evidence u prf2) => 
+      let prf3 : (u + x = u + (y + v)) = addXToBothSides u x (y + v) prf1 in
+      let prf4 : (x + u = u + (y + v)) = transL prf3 $ plusCommutative u x in
+      let prf5 : (u + (y + v) = y) = transL prf2 prf4 in
+      let prf6 : ((y + v) + u = y) = transL prf5 $ plusCommutative u (y + v) in
+      let prf7 : (y + (v + u) = y) = transL prf6 $ plusAssociative y v u in
+      let prf8 : ((v + u) + y = y) = transL prf7 $ plusCommutative y (v + u) in
+      theorem7 (v + u) y prf8
 
-decideOrder : (x, y : PNat) -> Order x y
-decideOrder O O = Equal Refl
-decideOrder O (N v) = 
-  let p : (O + v = N v) = Refl in
-  Less v p
-decideOrder (N u) O = 
-  let p : (N u = O + u) = Refl in
-  Greater u p
-decideOrder (N x) (N y) = case decideOrder x y of
-  Equal p     => Equal $ cong p
-  Less v p    => Less v $ cong p
-  Greater u p => Greater u $ cong p
+  data Order : (x, y : PNat) -> Type where
+    Equal : x = y -> Order x y
+    Less : (u : PNat) -> x + u = y -> Order x y
+    Greater : (v : PNat) -> x = y + v -> Order x y
 
-theorem9Part1 : (x, y : PNat) -> Either (x = y)
-                                        (ExactlyOne (Exists (\v => x = y + v)) 
-                                                    (Exists (\u => x + u = y)))
-theorem9Part1 x y = case decideOrder x y of
-  Equal prf => Left prf
-  Less u prf => Right $ ExactlyOnePf (Right (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
-  Greater u prf => Right $ ExactlyOnePf (Left (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
+  decideOrder : (x, y : PNat) -> Order x y
+  decideOrder O O = Equal Refl
+  decideOrder O (N v) = 
+    let p : (O + v = N v) = Refl in
+    Less v p
+  decideOrder (N u) O = 
+    let p : (N u = O + u) = Refl in
+    Greater u p
+  decideOrder (N x) (N y) = case decideOrder x y of
+    Equal p     => Equal $ cong p
+    Less v p    => Less v $ cong p
+    Greater u p => Greater u $ cong p
 
-theorem9Part2 : (x, y : PNat) -> x = y -> ExactlyOne (Exists (\v => x = y + v)) 
-                                                     (Exists (\u => x + u = y)) ->
-                                          Void
-theorem9Part2 x y prf1 prfExactlyOne =
-  case getWitness prfExactlyOne of
-    Left prfExists => case prfExists of
-      Evidence v prf2 => equalsImpliesNotPlusRight {x} {y} prf1 v prf2
-    Right prfExists => case prfExists of
-      Evidence u prf2 => equalsImpliesNotPlusLeft x y prf1 u prf2
+  theorem9Part1 : (x, y : PNat) -> Either (x = y)
+                                          (ExactlyOne (Exists (\v => x = y + v)) 
+                                                      (Exists (\u => x + u = y)))
+  theorem9Part1 x y = case decideOrder x y of
+    Equal prf => Left prf
+    Less u prf => Right $ ExactlyOnePf (Right (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
+    Greater u prf => Right $ ExactlyOnePf (Left (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
 
-theorem9 : (x, y : PNat) -> ExactlyOne (x = y)
-                                       (ExactlyOne (Exists (\v => x = y + v))
-                                                   (Exists (\u => x + u = y)))
-theorem9 x y = ExactlyOnePf (theorem9Part1 x y) (theorem9Part2 x y)
+  theorem9Part2 : (x, y : PNat) -> x = y -> ExactlyOne (Exists (\v => x = y + v)) 
+                                                       (Exists (\u => x + u = y)) ->
+                                            Void
+  theorem9Part2 x y prf1 prfExactlyOne =
+    case getWitness prfExactlyOne of
+      Left prfExists => case prfExists of
+        Evidence v prf2 => equalsImpliesNotPlusRight {x} {y} prf1 v prf2
+      Right prfExists => case prfExists of
+        Evidence u prf2 => equalsImpliesNotPlusLeft x y prf1 u prf2
+
