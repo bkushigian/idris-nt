@@ -173,12 +173,3 @@ theorem9 : (x, y : PNat) -> ExactlyOne (x = y)
                                        (ExactlyOne (Exists (\v => x = y + v))
                                                    (Exists (\u => x + u = y)))
 theorem9 x y = ExactlyOnePf (theorem9Part1 x y) (theorem9Part2 x y)
-
--- If x is not y, then either exists u such that x = y + u or exists u such
--- that x + u = y, but not both
---if_x_not_y : (x, y : PNat) -> (Not (x = y)) -> ExactlyOne (u ** x = y + u) (u ** x + u = y)
---if_x_not_y x@O y@O contra = let prf_eq : (x = y) = Refl in absurd (contra prf_eq)
---if_x_not_y x@O y@(N i) contra = let prf_plus : (u ** x + u = y) = (_ ** Refl) in 
---                                    ExactlyOnePf (Right prf_plus) ?prf1
---if_x_not_y (N i) O contra = ?if_x_not_y_rhs_3
---if_x_not_y (N i) (N j) contra = ?if_x_not_y_rhs_4
