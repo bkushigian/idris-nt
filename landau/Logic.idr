@@ -29,6 +29,10 @@ namespace ExactlyOne
 data Iff : (prop1 : Type) -> (prop2 : Type) -> Type where
   IffPf : (prop1 -> prop2) -> (prop2 -> prop1) -> Iff prop1 prop2
 
+namespace Iff
+  sym : Iff prop1 prop2 -> Iff prop2 prop1
+  sym (IffPf f g) = IffPf g f
+
 public export
 contrapositive : (p -> q) -> ((q -> Void) -> (p -> Void))
 contrapositive prf = \qImpliesFalse => \p => qImpliesFalse $ prf p
