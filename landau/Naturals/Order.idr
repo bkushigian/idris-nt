@@ -81,6 +81,7 @@ theorem13 : x .>= y -> y .<= x
 theorem13 (PlusOnRight prf) = PlusOnLeft (sym prf)
 
 theorem14 : x .<= y -> y .>= x
+theorem14 (PlusOnLeft prf) = PlusOnRight (sym prf)
 
 theorem15 : x .< y -> y .< z -> x .< z
 
