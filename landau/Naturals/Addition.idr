@@ -206,3 +206,19 @@ mutual
     Equal p     => Equal $ cong p
     Less v p    => Less v $ cong p
     Greater u p => Greater u $ cong p
+
+-- Some other nice facts for addition.
+-- were these already proven elsewhere?
+plusRightCancel : (left : PNat) -> (right : PNat) -> (c : PNat) -> left + c = right + c -> left = right
+plusRightCancel left right O prf =
+    let prf2 = replace {P = \x => x = right + O} (plusOneRightNext left) prf in
+    case replace {P = \x => N left = x} (plusOneRightNext right) prf2 of
+        Refl => Refl
+
+plusRightCancel left right (N i) prf =
+    let prf2 = plusEquivariantRight left i in
+    let prf3 = trans prf2 prf in
+    let prf4 = plusEquivariantRight right i in
+    let prf5 = trans prf3 (sym prf4) in
+    let prf6 = axiom4 (left + i) (right + i) prf5 in
+    plusRightCancel left right i prf6

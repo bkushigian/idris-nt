@@ -162,11 +162,24 @@ mutual
     theorem20 = (_20a, _20b, _20c)
 
     _20a : x + z .> y + z -> x .> y
+    _20a {x} {y} {z} (PlusOnRight {u} prf) =
+        PlusOnRight {u=u} (
+            plusRightCancel x (y + u) z $
+            rewrite plusAssociative y u z in
+            rewrite plusCommutative u z in
+            rewrite sym (plusAssociative y z u) in
+            prf
+        )
 
+
+    -- I think this fact belongs more to addition than ordering
+    -- so I put the main proof there
     -- Have to give a type hint here with {x : PNat}
     _20b : {x : PNat} -> x + z = y + z -> x = y
+    _20b {x} {y} {z} prf = plusRightCancel x y z prf
 
     _20c : x + z .< y + z -> x .< y
+    _20c {x} {y} {z} = theorem11 . (_20a {x=y} {y=x} {z=z}) . theorem12
 
 theorem21 : x .> y -> z .> u -> x + z .> y + u
 
