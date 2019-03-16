@@ -147,6 +147,7 @@ mutual
       let prf8 : ((v + u) + y = y) = transL prf7 $ plusCommutative y (v + u) in
       theorem7 (v + u) y prf8
 
+  private
   data Order : (x, y : PNat) -> Type where
     Equal : x = y -> Order x y
     Less : (u : PNat) -> x + u = y -> Order x y
