@@ -144,6 +144,7 @@ theorem16 {y} {z} (Right (x_lt_y, y_lte_z)) = case decEq y z of
 theorem17 : x .<= y -> y .<= z -> x .<= z
 
 theorem18 : x + y .> x
+theorem18 {x} {y} = PlusOnRight {x=(x + y)} {y=x} {u=y} Refl
 
 mutual
     theorem19 : (x .> y -> x + z .> y + z, x = y -> x + z = y + z, x .< y -> x + z .< y + z)
