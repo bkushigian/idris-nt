@@ -99,12 +99,14 @@ theorem8 (N j) y z contra prf = let inductiveHypothesis = theorem8 j y z contra 
                           let prf3 = axiom4 (j + y) (j + z) prf in
                                    inductiveHypothesis prf3
 
-{- We break theorem 9 up into a number of subparts.
+{-
+  Theorem 9: For given x and y, exactly one of the following must be the case:
+      1) x = y
+      2) There exists a u such that x = y + u
+      3) There exists a v such that y = x + v
 
-Theorem 9: For given x and y, exactly one of the following must be the case:
-    1) x = y
-    2) There exists a u such that x = y + u
-    3) There exists a v such that y = x + v
+  We break theorem 9 up into a number of subparts.
+
 -}
 
 equalsImpliesNotPlusRight : {x, y : PNat} -> x = y -> (v : PNat) -> x = y + v -> Void
