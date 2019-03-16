@@ -117,6 +117,12 @@ mutual
   theorem9 x y = ExactlyOnePf (theorem9Part1 x y) (theorem9Part2 x y)
 
   private
+  data Order : (x, y : PNat) -> Type where
+    Equal : x = y -> Order x y
+    Less : (u : PNat) -> x + u = y -> Order x y
+    Greater : (v : PNat) -> x = y + v -> Order x y
+
+  private
   theorem9Part1 : (x, y : PNat)
                -> Either (x = y) (ExactlyOne (Exists (\v => x = y + v)) (Exists (\u => x + u = y)))
   theorem9Part1 x y = case getOrder x y of
@@ -166,11 +172,6 @@ mutual
       let prf8 : ((v + u) + y = y) = transL prf7 $ plusCommutative y (v + u) in
       theorem7 (v + u) y prf8
 
-  private
-  data Order : (x, y : PNat) -> Type where
-    Equal : x = y -> Order x y
-    Less : (u : PNat) -> x + u = y -> Order x y
-    Greater : (v : PNat) -> x = y + v -> Order x y
 
   private
   getOrder : (x, y : PNat) -> Order x y
