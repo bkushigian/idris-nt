@@ -117,6 +117,25 @@ mutual
   theorem9 x y = ExactlyOnePf (theorem9Part1 x y) (theorem9Part2 x y)
 
   private
+  theorem9Part1 : (x, y : PNat)
+               -> Either (x = y) (ExactlyOne (Exists (\v => x = y + v)) (Exists (\u => x + u = y)))
+  theorem9Part1 x y = case getOrder x y of
+    Equal prf => Left prf
+    Less u prf => Right $ ExactlyOnePf (Right (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
+    Greater u prf => Right $ ExactlyOnePf (Left (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
+
+  private
+  theorem9Part2 : (x, y : PNat)
+               -> x = y
+               -> Not (ExactlyOne (Exists (\v => x = y + v)) (Exists (\u => x + u = y)))
+  theorem9Part2 x y prf1 prfExactlyOne =
+    case getWitness prfExactlyOne of
+      Left prfExists => case prfExists of
+        Evidence v prf2 => equalsImpliesNotPlusRight {x} {y} prf1 v prf2
+      Right prfExists => case prfExists of
+        Evidence u prf2 => equalsImpliesNotPlusLeft x y prf1 u prf2
+
+  private
   equalsImpliesNotPlusRight : {x, y : PNat} -> x = y -> (v : PNat) -> Not (x = y + v)
   equalsImpliesNotPlusRight {x = y} {y = y} Refl v prf1 =
     theorem7 v y (rewrite plusCommutative v y in rewrite prf1 in Refl)
@@ -166,23 +185,4 @@ mutual
     Equal p     => Equal $ cong p
     Less v p    => Less v $ cong p
     Greater u p => Greater u $ cong p
-
-  private
-  theorem9Part1 : (x, y : PNat)
-               -> Either (x = y) (ExactlyOne (Exists (\v => x = y + v)) (Exists (\u => x + u = y)))
-  theorem9Part1 x y = case getOrder x y of
-    Equal prf => Left prf
-    Less u prf => Right $ ExactlyOnePf (Right (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
-    Greater u prf => Right $ ExactlyOnePf (Left (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
-
-  private
-  theorem9Part2 : (x, y : PNat)
-               -> x = y
-               -> Not (ExactlyOne (Exists (\v => x = y + v)) (Exists (\u => x + u = y)))
-  theorem9Part2 x y prf1 prfExactlyOne =
-    case getWitness prfExactlyOne of
-      Left prfExists => case prfExists of
-        Evidence v prf2 => equalsImpliesNotPlusRight {x} {y} prf1 v prf2
-      Right prfExists => case prfExists of
-        Evidence u prf2 => equalsImpliesNotPlusLeft x y prf1 u prf2
 
