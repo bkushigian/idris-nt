@@ -30,14 +30,14 @@ import Naturals.PNat
 --------------------------------------------------------------------------------
 
 ||| If x != y then x' != y'
-theorem1 : (x : PNat) -> (y : PNat) -> (x = y -> Void) -> (N x = N y) -> Void
+theorem1 : (x : PNat) -> (y : PNat) -> Not (x = y) -> Not (N x = N y)
 theorem1 x y contra prf = contra (axiom4 x y prf)
 
 ||| For any natural x, x' != x
-theorem2 : (x : PNat) -> (N x = x) -> Void
+theorem2 : (x : PNat) -> Not (N x = x)
 theorem2 _ Refl impossible
 
-theorem3 : (x : PNat) -> (x = O -> Void) -> (u ** x = N u)
+theorem3 : (x : PNat) -> Not (x = O) -> (u ** x = N u)
 theorem3 O contra = void (contra Refl)
 theorem3 (N i) contra = (i ** Refl)
 
@@ -87,13 +87,13 @@ plusCommutative = theorem6
 private thm7Helper : (x : PNat) -> (y : PNat) -> x + (N y) = N y -> x + y = y
 thm7Helper x y prf = axiom4 (x + y) y $ replace prf $ plusEquivariantRight x y
 
-theorem7 : (x : PNat) -> (y : PNat) -> x + y = y -> Void
+theorem7 : (x : PNat) -> (y : PNat) -> Not (x + y = y)
 theorem7 O _ Refl impossible
 theorem7 (N _) O Refl impossible
 theorem7 x (N j) prf = let inductiveHypothesis = theorem7 x j in
                                inductiveHypothesis $ thm7Helper x j prf
 
-theorem8 : (x, y, z : PNat) -> (y = z -> Void) -> x + y = x + z -> Void
+theorem8 : (x, y, z : PNat) -> Not (y = z) -> Not (x + y = x + z)
 theorem8 O y z contra prf =  contra $ axiom4 y z prf
 theorem8 (N j) y z contra prf = let inductiveHypothesis = theorem8 j y z contra in
                           let prf3 = axiom4 (j + y) (j + z) prf in
@@ -117,12 +117,12 @@ mutual
   theorem9 x y = ExactlyOnePf (theorem9Part1 x y) (theorem9Part2 x y)
 
   private
-  equalsImpliesNotPlusRight : {x, y : PNat} -> x = y -> (v : PNat) -> x = y + v -> Void
+  equalsImpliesNotPlusRight : {x, y : PNat} -> x = y -> (v : PNat) -> Not (x = y + v)
   equalsImpliesNotPlusRight {x = y} {y = y} Refl v prf1 =
     theorem7 v y (rewrite plusCommutative v y in rewrite prf1 in Refl)
 
   private
-  equalsImpliesNotPlusLeft : (x, y : PNat) -> x = y -> (u : PNat) -> x + u = y -> Void
+  equalsImpliesNotPlusLeft : (x, y : PNat) -> x = y -> (u : PNat) -> Not (x + u = y)
   equalsImpliesNotPlusLeft y y Refl u prf1 =
     equalsImpliesNotPlusRight {x=y} {y=y} Refl u (rewrite prf1 in Refl)
 
@@ -167,18 +167,17 @@ mutual
     Greater u p => Greater u $ cong p
 
   private
-  theorem9Part1 : (x, y : PNat) -> Either (x = y)
-                                          (ExactlyOne (Exists (\v => x = y + v)) 
-                                                      (Exists (\u => x + u = y)))
+  theorem9Part1 : (x, y : PNat)
+               -> Either (x = y) (ExactlyOne (Exists (\v => x = y + v)) (Exists (\u => x + u = y)))
   theorem9Part1 x y = case getOrder x y of
     Equal prf => Left prf
     Less u prf => Right $ ExactlyOnePf (Right (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
     Greater u prf => Right $ ExactlyOnePf (Left (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
 
   private
-  theorem9Part2 : (x, y : PNat) -> x = y -> ExactlyOne (Exists (\v => x = y + v)) 
-                                                       (Exists (\u => x + u = y)) ->
-                                            Void
+  theorem9Part2 : (x, y : PNat)
+               -> x = y
+               -> Not (ExactlyOne (Exists (\v => x = y + v)) (Exists (\u => x + u = y)))
   theorem9Part2 x y prf1 prfExactlyOne =
     case getWitness prfExactlyOne of
       Left prfExists => case prfExists of
