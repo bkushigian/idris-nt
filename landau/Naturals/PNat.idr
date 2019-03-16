@@ -112,4 +112,3 @@ implementation DecEq PNat where
   decEq (N n) (N m) with (decEq n m)
     | Yes p = Yes $ cong p
     | No p = No $ \h : (N n = N m) => p $ axiom4 n m h
-

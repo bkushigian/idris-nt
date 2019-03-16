@@ -62,7 +62,7 @@ plusAssociative = theorem5
 plusOneRightNext : (x : PNat) -> x + O = N x
 plusOneRightNext O = Refl
 plusOneRightNext (N i) = let inductiveHypothesis = plusOneRightNext i in
-                             cong inductiveHypothesis 
+                             cong inductiveHypothesis
 
 plusEquivariantLeft : (x : PNat) -> (y : PNat) -> N (x + y) = N x + y
 plusEquivariantLeft O y = Refl
@@ -77,8 +77,8 @@ thm6Helper x y = rewrite plusEquivariantRight x y in Refl
 
 theorem6 : (x : PNat) -> (y : PNat) -> x + y = y + x
 theorem6 O y = rewrite plusOneRightNext y in Refl
-theorem6 (N i) y = let inductiveHypothesis = theorem6 i y in 
-                       rewrite inductiveHypothesis in 
+theorem6 (N i) y = let inductiveHypothesis = theorem6 i y in
+                       rewrite inductiveHypothesis in
                        rewrite thm6Helper y i in Refl
 
 plusCommutative : (x : PNat) -> (y : PNat) -> x + y = y + x
@@ -99,6 +99,14 @@ theorem8 (N j) y z contra prf = let inductiveHypothesis = theorem8 j y z contra 
                           let prf3 = axiom4 (j + y) (j + z) prf in
                                    inductiveHypothesis prf3
 
+-- Helper thing for stuff in Order.idr
+
+OnotPlus : Not (O = x + y)
+OnotPlus {x = O} {y = y} = OnotN
+OnotPlus {x = x} {y = O} =
+   rewrite plusCommutative x O in
+   OnotN
+OnotPlus {x = (N i)} {y = (N j)} = OnotN
 {-
   Theorem 9: For given x and y, exactly one of the following must be the case:
       1) x = y
@@ -198,4 +206,3 @@ mutual
     Equal p     => Equal $ cong p
     Less v p    => Less v $ cong p
     Greater u p => Greater u $ cong p
-

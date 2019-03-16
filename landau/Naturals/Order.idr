@@ -100,7 +100,36 @@ greatherThanTransitive xy yz =
     lessThanTransitive (theorem11 yz) (theorem11 xy)
 
 
-theorem16 : Either (x .<= y, y .< z) (x .< y, y .<= z) -> x .< y
+notDense : (x : PNat) -> (middle : PNat) -> (x .< middle) -> (middle .< N x) -> Void
+notDense x m (PlusOnLeft {v=u} x_u_m) (PlusOnLeft {v=v} m_v_y) =
+    let prf3 = replace {P = \mm => mm + v = N x} (sym x_u_m) m_v_y in
+    let prf4 = replace (sym (plusOneRightNext x)) prf3 in
+    let assoc = plusAssociative x u v in
+    let prf5 = trans (sym assoc) (prf4) in
+    let prf6 = theorem8 x (u+v) O in
+    prf6 (OnotPlus . sym) prf5
+
+
+greaterThanNotLTE : x .> y -> Not (x .<= y)
+greaterThanNotLTE {x = O} {y = y} (PlusOnRight prf) = void $ OnotPlus prf
+greaterThanNotLTE {x = (N i)} {y = y} ni_gt_y = \ni_leq_y =>
+    notDense y (N i) (theorem11 ni_gt_y) ni_leq_y
+
+
+notEqLTE : Not (x = y) -> x .<= y -> x .< y
+notEqLTE {x} {y} x_neq_y x_lte_y =
+    case theorem10 {x=x} {y=y} of
+        (ExactlyOnePf (Left x_eq_y) f) => void $ x_neq_y x_eq_y
+        (ExactlyOnePf (Right (ExactlyOnePf (Left x_gt_y) g)) f) => void $ (greaterThanNotLTE x_gt_y) x_lte_y
+        (ExactlyOnePf (Right (ExactlyOnePf (Right x_lt_y) g)) f) => x_lt_y
+
+theorem16 : Either (x .<= y, y .< z) (x .< y, y .<= z) -> x .< z
+theorem16 {x} {y} (Left (x_lte_y, y_lt_z)) = case decEq x y of
+    (Yes Refl) => y_lt_z
+    (No x_neq_y) => lessThanTransitive (notEqLTE x_neq_y x_lte_y) y_lt_z
+theorem16 {y} {z} (Right (x_lt_y, y_lte_z)) = case decEq y z of
+    (Yes Refl) => x_lt_y
+    (No y_neq_z) => lessThanTransitive x_lt_y (notEqLTE y_neq_z y_lte_z)
 
 theorem17 : x .<= y -> y .<= z -> x .<= z
 
