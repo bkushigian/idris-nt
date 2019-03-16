@@ -116,22 +116,35 @@ mutual
                                                      (Exists (\u => x + u = y)))
   theorem9 x y = ExactlyOnePf (theorem9Part1 x y) (theorem9Part2 x y)
 
-  private
-  data Order : (x, y : PNat) -> Type where
+  ||| A helper datatype, this allows us to match on the ordering
+  private data Order : (x, y : PNat) -> Type where
     Equal : x = y -> Order x y
     Less : (u : PNat) -> x + u = y -> Order x y
     Greater : (v : PNat) -> x = y + v -> Order x y
 
-  private
-  theorem9Part1 : (x, y : PNat)
+  ||| Part 1: Prove that at least one of
+  |||
+  |||       x = y
+  |||  and
+  |||       ExactlyOne (x = y + v) (x + u = y)
+  |||
+  ||| This is a lower bound on our statement... we still need to prove that at
+  ||| most one of these things is true
+  private theorem9Part1 : (x, y : PNat)
                -> Either (x = y) (ExactlyOne (Exists (\v => x = y + v)) (Exists (\u => x + u = y)))
   theorem9Part1 x y = case getOrder x y of
     Equal prf => Left prf
     Less u prf => Right $ ExactlyOnePf (Right (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
     Greater u prf => Right $ ExactlyOnePf (Left (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
 
-  private
-  theorem9Part2 : (x, y : PNat)
+  ||| Part 2: Prove that at most one of:
+  |||
+  |||       x = y
+  |||  and
+  |||       ExactlyOne (x = y + v) (x + u = y)
+  |||
+  ||| This is an upper bound on our statement.
+  private theorem9Part2 : (x, y : PNat)
                -> x = y
                -> Not (ExactlyOne (Exists (\v => x = y + v)) (Exists (\u => x + u = y)))
   theorem9Part2 x y prf1 prfExactlyOne =
@@ -172,9 +185,8 @@ mutual
       let prf8 : ((v + u) + y = y) = transL prf7 $ plusCommutative y (v + u) in
       theorem7 (v + u) y prf8
 
-
-  private
-  getOrder : (x, y : PNat) -> Order x y
+  ||| Given PNats x and y, determine if x < y, x = y, or x > y
+  private getOrder : (x, y : PNat) -> Order x y
   getOrder O O = Equal Refl
   getOrder O (N v) =
     let p : (O + v = N v) = Refl in
