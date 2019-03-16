@@ -146,15 +146,15 @@ mutual
     Less : (u : PNat) -> x + u = y -> Order x y
     Greater : (v : PNat) -> x = y + v -> Order x y
 
-  decideOrder : (x, y : PNat) -> Order x y
-  decideOrder O O = Equal Refl
-  decideOrder O (N v) = 
+  getOrder : (x, y : PNat) -> Order x y
+  getOrder O O = Equal Refl
+  getOrder O (N v) =
     let p : (O + v = N v) = Refl in
     Less v p
-  decideOrder (N u) O = 
+  getOrder (N u) O =
     let p : (N u = O + u) = Refl in
     Greater u p
-  decideOrder (N x) (N y) = case decideOrder x y of
+  getOrder (N x) (N y) = case getOrder x y of
     Equal p     => Equal $ cong p
     Less v p    => Less v $ cong p
     Greater u p => Greater u $ cong p
@@ -162,7 +162,7 @@ mutual
   theorem9Part1 : (x, y : PNat) -> Either (x = y)
                                           (ExactlyOne (Exists (\v => x = y + v)) 
                                                       (Exists (\u => x + u = y)))
-  theorem9Part1 x y = case decideOrder x y of
+  theorem9Part1 x y = case getOrder x y of
     Equal prf => Left prf
     Less u prf => Right $ ExactlyOnePf (Right (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
     Greater u prf => Right $ ExactlyOnePf (Left (Evidence u prf)) (plusRightImpliesNotPlusLeft x y)
