@@ -84,6 +84,10 @@ theorem14 : x .<= y -> y .>= x
 theorem14 (PlusOnLeft prf) = PlusOnRight (sym prf)
 
 theorem15 : x .< y -> y .< z -> x .< z
+theorem15 (PlusOnLeft {v=xy_v} prf_xy) (PlusOnLeft {v=yz_v} prf_yz) =
+    rewrite sym prf_yz in
+    rewrite sym prf_xy in
+    PlusOnLeft {v=xy_v + yz_v} (sym $ plusAssociative x xy_v yz_v)
 
 theorem16 : Either (x .<= y, y .< z) (x .< y, y .<= z) -> x .< y
 
