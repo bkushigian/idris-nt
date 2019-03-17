@@ -231,3 +231,6 @@ plusRight {x} {y} {z=(N j)} prf = let inductiveHypothesis = plusRight {x} {y} {z
 
 plusLeft : {x, y, z : PNat} -> x = y -> z + x = z + y
 plusLeft {x} {y} {z} prf = trans (trans (plusCommutative z x) (plusRight prf)) (plusCommutative y z)
+
+plusEqualities : {x, y, z, w : PNat} -> x = y -> w = z -> x + w = y + z
+plusEqualities Refl Refl = Refl
