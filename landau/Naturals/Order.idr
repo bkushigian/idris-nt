@@ -104,8 +104,8 @@ lessThanTransitive = theorem15
 
 ||| This is the preliminary remark given after Theorem 15, since Idris
 ||| doesn't have the luxury of "simply reading the formula backwards".
-greatherThanTransitive : x .> y -> y .> z -> x .> z
-greatherThanTransitive xy yz =
+greaterThanTransitive : x .> y -> y .> z -> x .> z
+greaterThanTransitive xy yz =
     theorem12 $
     lessThanTransitive (theorem11 yz) (theorem11 xy)
 
@@ -190,7 +190,18 @@ mutual
     _20c : x + z .< y + z -> x .< y
     _20c {x} {y} {z} = theorem11 . (_20a {x=y} {y=x} {z=z}) . theorem12
 
+equalsGreaterThanRight : z .> x -> x = y -> z .> y
+equalsGreaterThanRight z_gt_x x_eq_y = rewrite sym x_eq_y in z_gt_x
+
 theorem21 : x .> y -> z .> u -> x + z .> y + u
+theorem21 {y} {z} {u} x_gt_y z_gt_u =
+    let theorem19_z = fst (theorem19 {z=z}) in
+    let theorem19_y = fst (theorem19 {z=y}) in
+    let xz_gt_yz = theorem19_z x_gt_y in    -- x+z > y+z
+    let yz_eq_zy = plusCommutative y z in   -- y+z = z+y
+    let zy_gt_uy = theorem19_y z_gt_u in    -- z+y > u+y
+    let uy_eq_yu = plusCommutative u y in   -- u+y = y+u
+    ((xz_gt_yz `equalsGreaterThanRight` yz_eq_zy) `greaterThanTransitive` zy_gt_uy) `equalsGreaterThanRight` uy_eq_yu
 
 theorem22 : Either (x .>= y, z .> u) (x .> y, z .> u) -> x + z .> y + u
 
