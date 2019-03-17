@@ -161,8 +161,10 @@ mutual
 
     -- Have to give a type hint here with {x : PNat}
     _19b : {x : PNat} -> x = y -> x + z = y + z
+    _19b = plusRight
 
     _19c : x .< y -> x + z .< y + z
+    _19c {x} {y} {z} prf = theorem11 {x=(y + z)} {y=(x + z)} $ _19a $ theorem12 prf
 
 mutual
     theorem20 : (x + z .> y + z -> x .> y, x + z = y + z -> x = y, x + z .< y + z -> x .< y)
