@@ -272,7 +272,8 @@ theorem24 {x} = theorem18 {x=O} {y=x}
 
 theorem25 : y .> x -> y .>= x + 1
 
-theorem26 : y .< x + y -> y .<= x
+theorem26 : y .< x + 1 -> y .<= x
+theorem26 {x} y_lt_x1 = rewrite sym (plusCommutative x O) in y_lt_x1
 
 MinBound PNat where
   minBound = O
