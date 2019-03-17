@@ -119,6 +119,22 @@ notDense x m (PlusOnLeft {v=u} x_u_m) (PlusOnLeft {v=v} m_v_y) =
     let prf6 = theorem8 x (u+v) O in
     prf6 (OnotPlus . sym) prf5
 
+eitherLessOrEqual : x .<= y -> Either (x = y) (x .< y)
+eitherLessOrEqual {x} {y} (PlusOnLeft {v = O} prf) =
+    let prf2 = plusOneRightNext x in
+    let nx_eq_ny = (sym prf2) `trans` prf in
+    Left (axiom4 x y nx_eq_ny)
+eitherLessOrEqual {x} {y} (PlusOnLeft {v = (N i)} prf) =
+    let prf2 = plusEquivariantRight x i in
+    let prf3 = prf2 `trans` prf in
+    let prf4 = axiom4 (x+i) y prf3 in
+    Right (PlusOnLeft prf4)
+
+eitherGreaterOrEqual : x .>= y -> Either (x = y) (x .> y)
+eitherGreaterOrEqual x_gt_y =
+    case eitherLessOrEqual (theorem13 x_gt_y) of
+        (Left y_eq_x) => Left (sym y_eq_x)
+        (Right y_lt_x) => Right (theorem12 y_lt_x)
 
 greaterThanNotLTE : x .> y -> Not (x .<= y)
 greaterThanNotLTE {x = O} {y = y} (PlusOnRight prf) = void $ OnotPlus prf
