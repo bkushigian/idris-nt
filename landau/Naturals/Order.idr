@@ -219,7 +219,21 @@ theorem21 {y} {z} {u} x_gt_y z_gt_u =
     let uy_eq_yu = plusCommutative u y in   -- u+y = y+u
     ((xz_gt_yz `equalsGreaterThanRight` yz_eq_zy) `greaterThanTransitive` zy_gt_uy) `equalsGreaterThanRight` uy_eq_yu
 
-theorem22 : Either (x .>= y, z .> u) (x .> y, z .> u) -> x + z .> y + u
+theorem22 : Either (x .>= y, z .> u) (x .> y, z .>= u) -> x + z .> y + u
+theorem22 {y} {z} {u} (Left (x_gte_y, z_gt_u)) = case eitherGreaterOrEqual x_gte_y of
+    (Left Refl) =>
+        let theorem19_1_y = fst (theorem19 {z=y}) in
+        let prf2 = theorem19_1_y z_gt_u in
+        rewrite plusCommutative y z in
+        rewrite plusCommutative y u in
+        prf2
+    (Right x_gt_y) => theorem21 x_gt_y z_gt_u
+
+theorem22 {u} (Right (x_gt_y, z_gte_u)) = case eitherGreaterOrEqual z_gte_u of
+    (Left Refl) =>
+        let theorem19_1_u = fst (theorem19 {z=u}) in
+        theorem19_1_u x_gt_y
+    (Right z_gt_u) => theorem21 x_gt_y z_gt_u
 
 theorem23 : x .>= y -> z .>= u -> x + z .>= y + u
 
