@@ -270,6 +270,13 @@ theorem23 {y} {u} x_gte_y z_gte_u = case (eitherGreaterOrEqual x_gte_y, eitherGr
 theorem24 : x .>= 1
 
 theorem25 : y .> x -> y .>= x + 1
+theorem25 {x} {y} (PlusOnRight {u} prf) =
+  let prf1 : (N y = (x + u) + 1) = trans (cong prf) (sym (plusOneRightNext (x + u))) in
+  let prf2 : (N y = x + (u + 1)) = trans prf1 $ plusAssociative x u 1 in
+  let prf3 : (x + (u + 1) = x + (1 + u)) = plusLeft {x=(u + 1)} {y=(1 + u)} {z=x} $ plusCommutative u 1 in
+  let prf4 : (N y = x + (1 + u)) = trans prf2 prf3 in
+  let prf5 : (N y = (x + 1) + u) = trans prf4 $ sym $ plusAssociative x 1 u in
+  PlusOnRight {x=N y} {y=(x + 1)} {u=u} prf5
 
 theorem26 : y .< x + y -> y .<= x
 
