@@ -209,6 +209,22 @@ mutual
 equalsGreaterThanRight : z .> x -> x = y -> z .> y
 equalsGreaterThanRight z_gt_x x_eq_y = rewrite sym x_eq_y in z_gt_x
 
+nextLessThan : x .< N x
+nextLessThan {x} = rewrite plusCommutative O x in PlusOnLeft {v=O} Refl
+
+equalsImpliesLTE : x = y -> x .<= y
+equalsImpliesLTE Refl = nextLessThan
+
+equalsImpliesGTE : x = y -> x .>= y
+equalsImpliesGTE Refl = theorem12 nextLessThan
+
+lessThanImpliesLTE : x .< y -> x .<= y
+lessThanImpliesLTE {y} x_lt_y = x_lt_y `lessThanTransitive` (nextLessThan {x=y})
+
+greaterThanImpliesGTE : x .> y -> x .>= y
+greaterThanImpliesGTE {x} x_gt_y = (theorem12 (nextLessThan {x=x})) `greaterThanTransitive` x_gt_y
+
+
 theorem21 : x .> y -> z .> u -> x + z .> y + u
 theorem21 {y} {z} {u} x_gt_y z_gt_u =
     let theorem19_z = fst (theorem19 {z=z}) in
@@ -236,6 +252,20 @@ theorem22 {u} (Right (x_gt_y, z_gte_u)) = case eitherGreaterOrEqual z_gte_u of
     (Right z_gt_u) => theorem21 x_gt_y z_gt_u
 
 theorem23 : x .>= y -> z .>= u -> x + z .>= y + u
+theorem23 {y} {u} x_gte_y z_gte_u = case (eitherGreaterOrEqual x_gte_y, eitherGreaterOrEqual z_gte_u) of
+    (Left x_eq_y, Left z_eq_u) =>
+        PlusOnRight {u=O} $
+        rewrite plusCommutative (y+u) O in
+        cong (plusEqualities x_eq_y z_eq_u)
+    (Left x_eq_y, Right z_gt_u) =>
+        greaterThanImpliesGTE $
+        theorem22 (Left (equalsImpliesGTE x_eq_y, z_gt_u))
+    (Right x_gt_y, Left z_eq_u) =>
+        greaterThanImpliesGTE $
+        theorem22 (Right (x_gt_y, equalsImpliesGTE z_eq_u))
+    (Right x_gt_y, Right z_gt_u) =>
+        greaterThanImpliesGTE $
+        theorem21 x_gt_y z_gt_u
 
 theorem24 : x .>= 1
 
