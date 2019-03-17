@@ -222,3 +222,12 @@ plusRightCancel left right (N i) prf =
     let prf5 = trans prf3 (sym prf4) in
     let prf6 = axiom4 (left + i) (right + i) prf5 in
     plusRightCancel left right i prf6
+
+plusRight : {x, y, z : PNat} -> x = y -> x + z = y + z
+plusRight {x} {y} {z=O} prf = let prf1 : (N x = N y) = cong prf in
+  trans (trans (plusOneRightNext x) prf1) (sym (plusOneRightNext y))
+plusRight {x} {y} {z=(N j)} prf = let inductiveHypothesis = plusRight {x} {y} {z=j} prf in
+  trans (trans (sym (plusEquivariantRight x j)) (cong inductiveHypothesis)) $ plusEquivariantRight y j
+
+plusLeft : {x, y, z : PNat} -> x = y -> z + x = z + y
+plusLeft {x} {y} {z} prf = trans (trans (plusCommutative z x) (plusRight prf)) (plusCommutative y z)

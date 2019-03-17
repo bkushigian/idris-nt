@@ -151,6 +151,13 @@ mutual
     theorem19 = (_19a, _19b, _19c)
 
     _19a : x .> y -> x + z .> y + z
+    _19a {x} {y} {z} (PlusOnRight {u} prf) =
+      let prf1 : (x + z = (y + u) + z) = plusRight {y=(y + u)} prf in
+      let prf2 : (x + z = y + (u + z)) = trans prf1 $ plusAssociative y u z in
+      let prf3 : (y + (u + z) = y + (z + u)) = plusLeft {x=(u + z)} {y=(z + u)} {z=y} $ plusCommutative u z in
+      let prf4 : (x + z = y + (z + u)) = trans prf2 $ prf3 in
+      let prf5 : (x + z = (y + z) + u) = trans prf4 $ sym $ plusAssociative y z u in
+      PlusOnRight {x=(x + z)} {y=(y + z)} {u=u} prf5
 
     -- Have to give a type hint here with {x : PNat}
     _19b : {x : PNat} -> x = y -> x + z = y + z
