@@ -6,15 +6,19 @@ import Naturals.Addition
 import Logic
 
 
+-- A set of PNats is a family of propositions indexed by PNats
 PSet : Type
 PSet = PNat -> Type
 
+-- A set of PNats is a decidable set if the proposition for each n is decidable
 data SetDec : (s : PSet) -> Type where
     AllDec : ((n : PNat) -> Dec (s n)) -> SetDec s
 
+-- A PNat x is in the set if the proposition (P x) is true (has a proof)
 data SetElem : (x : PNat) -> (s : PSet) -> Type where
     Satisfies : (prf : s x) -> SetElem x s
 
+-- We can easily define operations on sets
 setIntersection : PSet -> PSet -> PSet
 setIntersection u v = \n => (u n, v n)
 
@@ -24,51 +28,67 @@ setUnion u v = \n => Either (u n) (v n)
 setComplement : PSet -> PSet
 setComplement u = \n => Not (u n)
 
+-- A set is a subset of another set if the proposition implies the other
 data IsSubset : (u : PSet) -> (v : PSet) -> Type where
     ConditionImplies : ((n : PNat) -> u n -> v n) -> IsSubset u v
 
 
-
+-- Here is an example of a set, all the PNats that are not equal to O
 NotOne : PSet
-NotOne = \n => Not (n = 0)
+NotOne = \n => Not (n = O)
 
+-- We prove it is a decidable set
 NotOneDec : SetDec NotOne
 NotOneDec = AllDec $ \n =>
-    case decEq n 0 of
+    case decEq n O of
         (Yes prf) => No (notNot prf)
         (No contra) => Yes contra
 
-
+-- We can show that O is not an element of it
 oneNotElem : Not (O `SetElem` NotOne)
 oneNotElem = \elem => case elem of
     (Satisfies prf) => prf Refl
 
+-- And that any n >= 2 is an element
 ge2Elem : (x : PNat) -> (x .>= 2) -> x `SetElem` NotOne
 ge2Elem (N u) (PlusOnRight Refl) = Satisfies (axiom3 u)
 
+
+-- A set has been proved to be empty if we can prove the proposition is false for all n
 data IsEmpty : (s : PSet) -> Type where
     AllFalse : ((n : PNat) -> Not (n `SetElem` s)) -> IsEmpty s
 
+
+-- We know a set contains something if there exists an element in the set
 data ContainsSomething : (s : PSet) -> Type where
     HasElement : (n ** n `SetElem` s) -> ContainsSomething s
 
+
+-- Here is another example set: the set for which n is equal to 1 and 2
 OneAndTwo : PSet
 OneAndTwo = \n => (n = 1, n = 2) -- could also be done with setIntersection
 
+-- We can prove that this set is empty
 OneAndTwoEmpty : IsEmpty OneAndTwo
 OneAndTwoEmpty = AllFalse $ \n,(Satisfies (prf1, prf2)) => absurd $ (sym prf1) `trans` prf2
 
 
+-- A set that contains something is NOT the empty set
 nonEmpty' : ContainsSomething s -> Not (IsEmpty s)
 nonEmpty' {s} (HasElement (x ** pf)) = \empty => case empty of
     (AllFalse f) => f x pf
 
+
+-- We can show axiom5
 axiom5 : (s : PSet) -> O `SetElem` s -> ((x : PNat) -> x `SetElem` s -> (N x) `SetElem` s) -> (y : PNat) -> y `SetElem` s
 axiom5 s one_elem next_elem O = one_elem
 axiom5 s one_elem next_elem (N i) = next_elem i (axiom5 s one_elem next_elem i)
 
 
--- nonInduction : (s : PSet) -> O `SetElem` s -> (n ** Not (n `SetElem` s)) -> (m ** (m `SetElem` s, Not ((N m) `SetElem` s)))
+-- Everything below here is a proof of theorem27 (the main theorem is at the bottom)
+-- This is a weaker version of theorem27 presented in the book in two ways:
+--  1. The set is required to be decidable,
+--  2. and we require ContainsSomething s, not just Not (IsEmpty s)
 
 
 lte1 : x .<= O -> x = O
@@ -102,9 +122,6 @@ emptyDecLe g gDec@(AllDec decF) (N x) = case decF (N x) of
                         allBad y y_lt_nx (Satisfies gy)
             )
 
--- containsLessThan
-
--- lem : (g : PSet) -> (y : PNat) -> y `SetElem` g -> ((x : PNat) -> x .<= N i -> Not (SetElem x g)) ->
 
 lessThanN : x .< y -> N x .< N y
 lessThanN (PlusOnLeft x_y) = PlusOnLeft (cong x_y)
@@ -138,9 +155,6 @@ greaterThanBound g (N i) imp e e_elem = case theorem10 {x=e} {y=N i} of
     (ExactlyOnePf (Right (ExactlyOnePf (Right e_lt_ni) g)) f) =>
         let e_lt_nni = e_lt_ni `lessThanTransitive` lessThanNext in
         void $ imp e e_lt_nni e_elem
-
--- greaterThanBound g u imp O e_elem = void $ imp O (theorem13 theorem24) e_elem
--- greaterThanBound g u imp (N i) e_elem = ?greaterThanBound_rhs_2
 
 sandwich : b .< x -> x .< N (N b) -> x = N b
 sandwich {b} {x} b_x x_nnb = case eitherLessOrEqual x_nnb of
