@@ -63,7 +63,16 @@ multDistributiveLeft = theorem30
 
 
 theorem31 : {x : PNat} -> (x * y) * z = x * (y * z)
+theorem31 {x} {y} {z = O} = Refl
+theorem31 {x} {y} {z = (N z)} =
+    let ih = theorem31 {x=x} {y=y} {z=z} in
+    rewrite ih in
+    let distr = multDistributiveLeft {x=x} {y=y*z} {z=y} in
+    rewrite distr in
+    Refl
 
+multAssociative : {x : PNat} -> (x * y) * z = x * (y * z)
+multAssociative = theorem31
 
 mutual
     theorem32 : (x .> y -> x*z .> y*z, x = y -> x*z = y*z, x .< y -> x*z .< y*z)
