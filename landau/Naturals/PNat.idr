@@ -34,8 +34,8 @@ plusPNat (N i) y = N (plusPNat i y)
 ||| Defining multiplication on PNats here to allow us to inherit the Num
 ||| interface and get some nicer syntax.
 multPNat : (x : PNat) -> (y : PNat) -> PNat
-multPNat O y = y
-multPNat (N i) y = (plusPNat y (multPNat i y))
+multPNat x O = x
+multPNat x (N y) = plusPNat (multPNat x y) x
 
 fromIntegerPNat : Integer -> PNat
 fromIntegerPNat 1 = O
