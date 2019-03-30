@@ -55,8 +55,7 @@ theorem5 : (x : PNat) -> (y : PNat) -> (z : PNat) -> (x + y) + z = x + (y + z)
 theorem5 O y z = Refl
 theorem5 (N i) y z = cong (theorem5 i y z)
 
-plusAssociative : (x : PNat) -> (y : PNat) -> (z : PNat)
-               -> (x + y) + z = x + (y + z)
+plusAssociative : (x : PNat) -> (y : PNat) -> (z : PNat) -> (x + y) + z = x + (y + z)
 plusAssociative = theorem5
 
 plusOneRightNext : (x : PNat) -> x + O = N x

@@ -25,8 +25,8 @@ multOneLeftIdentity {x = (N x)} =
 
 
 multNextLeft : {x, y : PNat} -> (N x) * y = x*y + y
-multNextLeft {x = x} {y = O} = sym (plusOneRightNext x)
-multNextLeft {x = x} {y = (N y)} =
+multNextLeft {x} {y = O} = sym (plusOneRightNext x)
+multNextLeft {x} {y = (N y)} =
     let ih = multNextLeft {x=x} {y=y} in
     rewrite ih in
     rewrite plusAssociative (x*y) y (N x) in
@@ -38,18 +38,28 @@ multNextLeft {x = x} {y = (N y)} =
     plusCommutative y x
 
 theorem29 : {x : PNat} -> x * y = y * x
-theorem29 {x = O} {y = y} = multOneLeftIdentity
-theorem29 {x = (N x)} {y = y} =
+theorem29 {x = O} {y} = multOneLeftIdentity
+theorem29 {x = (N x)} {y} =
     let ih = theorem29 {x=x} {y=y} in
     let prf2 = plusRight {z=y} ih in
     let prf3 = multNextLeft {x=x} {y=y} in
     prf3 `trans` prf2
 
-
 multCommutative : {x : PNat} -> x * y = y * x
 multCommutative = theorem29
 
+
 theorem30 : {x : PNat} -> x * (y + z) = (x * y) + (x * z)
+theorem30 {x} {y} {z = O} = cong {f= \thing => x * thing} (plusOneRightNext y)
+theorem30 {x} {y} {z = (N z)} =
+    let ih = theorem30 {x=x} {y=y} {z=z} in
+    rewrite sym (plusEquivariantRight y z) in
+    rewrite ih in
+    rewrite plusAssociative (x*y) (x*z) x in
+    Refl
+
+multDistributiveLeft : {x : PNat} -> x * (y + z) = (x * y) + (x * z)
+multDistributiveLeft = theorem30
 
 
 theorem31 : {x : PNat} -> (x * y) * z = x * (y * z)
