@@ -61,6 +61,16 @@ theorem30 {x} {y} {z = (N z)} =
 multDistributiveLeft : {x : PNat} -> x * (y + z) = (x * y) + (x * z)
 multDistributiveLeft = theorem30
 
+multDistributiveRight : {x : PNat} -> (y + z) * x = (y * x) + (z * x)
+multDistributiveRight {x} {y} {z} =
+    let com1 = multCommutative {x=y+z} {y=x} in
+    let com2 = multCommutative {x=y} {y=x} in
+    let com3 = multCommutative {x=z} {y=x} in
+    rewrite com1 in
+    rewrite com2 in
+    rewrite com3 in
+    multDistributiveLeft
+
 
 theorem31 : {x : PNat} -> (x * y) * z = x * (y * z)
 theorem31 {x} {y} {z = O} = Refl
@@ -79,10 +89,21 @@ mutual
     theorem32 = (_32a, _32b, _32c)
 
     _32a : x .> y -> x*z .> y*z
+    _32a {y} {z} (PlusOnRight {u} x_yu) =
+        let prf1 = cong {f = \thing => thing * z} x_yu in
+        let prf2 = multDistributiveRight {x=z} {y=y} {z=u} in
+        let prf3 = prf1 `trans` prf2 in
+        rewrite prf3 in
+        theorem18
 
     _32b : {x : PNat} -> x = y -> x*z = y*z
+    _32b Refl = Refl
 
     _32c : x .< y -> x*z .< y*z
+    _32c {z} x_lt_y =
+        let y_gt_x = theorem12 x_lt_y in
+        let prf1 = _32a {z=z} y_gt_x in
+        theorem11 prf1
 
 mutual
     theorem33 : (x*z .> y*z -> x .> y, x*z = y*z -> x = y, x*z .< y*z -> x .< y)
