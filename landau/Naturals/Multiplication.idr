@@ -105,15 +105,59 @@ mutual
         let prf1 = _32a {z=z} y_gt_x in
         theorem11 prf1
 
+
 mutual
     theorem33 : (x*z .> y*z -> x .> y, x*z = y*z -> x = y, x*z .< y*z -> x .< y)
     theorem33 = (_33a, _33b, _33c)
 
     _33a : x*z .> y*z -> x .> y
+    _33a {x} {y} {z = O} xz_gt_yz = xz_gt_yz
+    _33a {x} {y} {z = (N zi)} prf =
+        let ih = _33a {x=x} {y=y} {z=zi} in
+        case theorem10 {x=x} {y=y} of
+            (ExactlyOnePf (Left x_y) f) =>
+                let prf1 = sym (plusLeft {x=x} {y=y} {z=y*zi} x_y) in
+                let prf2 = equalsGreaterThanRight prf prf1 in
+                let prf3 = (fst (theorem20 {x=x*zi} {y=y*zi} {z=x})) prf2 in
+                let prf4 = ih prf3 in
+                prf4
+            (ExactlyOnePf (Right (ExactlyOnePf (Left x_gt_y) g)) f) => x_gt_y
+            (ExactlyOnePf (Right (ExactlyOnePf (Right x_lt_y) g)) f) =>
+                let prf5 = theorem12 x_lt_y in
+                let prf6 = (fst (theorem19 {x=y} {y=x} {z=y*zi})) prf5 in
+                let prf7 = replace {P = \thing => thing .> x + (y*zi)} (plusCommutative y (y*zi)) prf6 in
+                let prf8 = replace {P = \thing => (y*zi)+y .> thing} (plusCommutative x (y*zi)) prf7 in
+                let prf9 = prf `greaterThanTransitive` prf8 in
+                let prf10 = (fst (theorem20 {x=x*zi} {y=y*zi} {z=x})) prf9 in
+                let prf11 = ih prf10 in
+                prf11
 
     _33b : {x : PNat} -> x*z = y*z -> x = y
+    _33b {x = O} {y = O} {z} prf = multOneLeftIdentity
+    _33b {x = O} {y = (N yi)} {z} prf =
+        let prf2 = multNextLeft {x=yi} {y=z} in
+        let prf3 = prf `trans` prf2 in
+        let prf4 = multOneLeftIdentity {x=z} in
+        let prf5 = sym ((sym prf4) `trans` prf3) in
+        let contra = theorem7 (yi*z) z in
+        void $ contra prf5
+    _33b {x = (N xi)} {y = O} {z} prf =
+        let prf2 = multNextLeft {x=xi} {y=z} in
+        let prf3 = sym prf `trans` prf2 in
+        let prf4 = multOneLeftIdentity {x=z} in
+        let prf5 = sym ((sym prf4) `trans` prf3) in
+        let contra = theorem7 (xi*z) z in
+        void $ contra prf5
+    _33b {x = (N xi)} {y = (N yi)} {z} prf =
+        let prf2 = multNextLeft {x=xi} {y=z} in
+        let prf3 = multNextLeft {x=yi} {y=z} in
+        let prf4 = sym prf2 `trans` (prf `trans` prf3) in
+        let prf5 = plusRightCancel (xi*z) (yi*z) z prf4 in
+        let prf6 = _33b {x=xi} {y=yi} {z=z} prf5 in
+        cong {f=N} prf6
 
     _33c : x*z .< y*z -> x .< y
+    _33c {x} {y} {z} = theorem11 . (_33a {z=z}) . theorem12
 
 theorem34 : (x .> y, z .> u) -> x*z .> y*u
 
