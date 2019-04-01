@@ -185,4 +185,10 @@ theorem35 {x} {y} {z} {u} (Right (x_gt_y, z_gte_u)) =
         (Right z_gt_u) => theorem34 x_gt_y z_gt_u
 
 
-theorem36 : (x .>= y, z .>= y) -> x*z .>= y*u
+theorem36 : x .>= y -> z .>= u -> x*z .>= y*u
+theorem36 x_gte_y z_gte_u =
+    case (eitherGreaterOrEqual x_gte_y, eitherGreaterOrEqual z_gte_u) of
+        (Left Refl, Left Refl) => theorem12 lessThanNext
+        (Left x_eq_y, Right z_gt_u) => greaterThanImpliesGTE $ theorem35 (Left (x_gte_y, z_gt_u))
+        (Right x_gt_y, Left z_eq_u) => greaterThanImpliesGTE $ theorem35 (Right (x_gt_y, z_gte_u))
+        (Right x_gt_y, Right z_gt_u) => greaterThanImpliesGTE $ theorem34 x_gt_y z_gt_u
