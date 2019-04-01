@@ -159,14 +159,30 @@ mutual
     _33c : x*z .< y*z -> x .< y
     _33c {x} {y} {z} = theorem11 . (_33a {z=z}) . theorem12
 
-theorem34 : (x .> y, z .> u) -> x*z .> y*u
-theorem34 {x} {y} {z} {u} (x_gt_y, z_gt_u) =
+theorem34 : x .> y -> z .> u -> x*z .> y*u
+theorem34 {x} {y} {z} {u} x_gt_y z_gt_u =
     let xz_gt_yz = (fst (theorem32 {x=x} {y=y} {z=z})) x_gt_y in
     let yz_eq_zy = multCommutative {x=y} {y=z} in
     let zy_gt_uy = (fst (theorem32 {x=z} {y=u} {z=y})) z_gt_u in
     let uy_eq_yu = multCommutative {x=u} {y=y} in
     ((xz_gt_yz `equalsGreaterThanRight` yz_eq_zy) `greaterThanTransitive` zy_gt_uy) `equalsGreaterThanRight` uy_eq_yu
 
+
 theorem35 : Either (x .>= y, z .> u) (x .> y, z .>= u) -> x*z .> y*u
+theorem35 {x} {y} {z} {u} (Left (x_gte_y, z_gt_u)) =
+    case eitherGreaterOrEqual x_gte_y of
+        (Left Refl) =>
+            let com1 = multCommutative {x=y} {y=z} in
+            let com2 = multCommutative {x=y} {y=u} in
+            rewrite com1 in
+            rewrite com2 in
+            (fst (theorem32 {x=z} {y=u} {z=y})) z_gt_u
+        (Right x_gt_y) => theorem34 x_gt_y z_gt_u
+
+theorem35 {x} {y} {z} {u} (Right (x_gt_y, z_gte_u)) =
+    case eitherGreaterOrEqual z_gte_u of
+        (Left Refl) => (fst (theorem32 {x=x} {y=y} {z=u})) x_gt_y
+        (Right z_gt_u) => theorem34 x_gt_y z_gt_u
+
 
 theorem36 : (x .>= y, z .>= y) -> x*z .>= y*u
