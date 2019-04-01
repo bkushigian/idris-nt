@@ -160,6 +160,12 @@ mutual
     _33c {x} {y} {z} = theorem11 . (_33a {z=z}) . theorem12
 
 theorem34 : (x .> y, z .> u) -> x*z .> y*u
+theorem34 {x} {y} {z} {u} (x_gt_y, z_gt_u) =
+    let xz_gt_yz = (fst (theorem32 {x=x} {y=y} {z=z})) x_gt_y in
+    let yz_eq_zy = multCommutative {x=y} {y=z} in
+    let zy_gt_uy = (fst (theorem32 {x=z} {y=u} {z=y})) z_gt_u in
+    let uy_eq_yu = multCommutative {x=u} {y=y} in
+    ((xz_gt_yz `equalsGreaterThanRight` yz_eq_zy) `greaterThanTransitive` zy_gt_uy) `equalsGreaterThanRight` uy_eq_yu
 
 theorem35 : Either (x .>= y, z .> u) (x .> y, z .>= u) -> x*z .> y*u
 

@@ -209,6 +209,11 @@ mutual
 equalsGreaterThanRight : z .> x -> x = y -> z .> y
 equalsGreaterThanRight z_gt_x x_eq_y = rewrite sym x_eq_y in z_gt_x
 
+--   x = y   ->   z .> x    ->  z .> y
+equalsGreaterThanLeft : x = y -> y .> z -> x .> z
+equalsGreaterThanLeft Refl y_gt_z = y_gt_z
+
+
 lessThanNext : x .< N x
 lessThanNext {x} = rewrite plusCommutative O x in PlusOnLeft {v=O} Refl
 
