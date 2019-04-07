@@ -28,6 +28,7 @@ equalsImpliesEquivalent : x = y -> x .~ y
 equalsImpliesEquivalent Refl = theorem37
 
 theorem38 : x .~ y -> y .~ x
+theorem38 (EquivalentCrossMultiply prf) = EquivalentCrossMultiply (sym prf)
 
 theorem39 : x .~ y -> y .~ z -> x .~ z
 
