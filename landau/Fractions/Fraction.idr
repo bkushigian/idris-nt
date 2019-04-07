@@ -2,6 +2,9 @@ module Fractions.Fraction
 
 import Naturals.PNat
 
+%access public export
+%default total
+
 ||| Definition 7, fraction x_1 / x_2, stored as (x_1, x_2)
 Fraction : Type
 Fraction = (PNat, PNat)
@@ -18,8 +21,11 @@ infixl 5 .~
 data (.~) : (lhs : Fraction) -> (rhs : Fraction) -> Type where
     EquivalentCrossMultiply : (top lhs)*(bot rhs) = (top rhs)*(bot lhs) -> lhs .~ rhs
 
-
 theorem37 : x .~ x
+theorem37 = EquivalentCrossMultiply Refl
+
+equalsImpliesEquivalent : x = y -> x .~ y
+equalsImpliesEquivalent Refl = theorem37
 
 theorem38 : x .~ y -> y .~ x
 
