@@ -159,6 +159,10 @@ mutual
     _33c : x*z .< y*z -> x .< y
     _33c {x} {y} {z} = theorem11 . (_33a {z=z}) . theorem12
 
+
+multRightCancel : {x, y, z : PNat} -> x*z = y*z -> x = y
+multRightCancel = _33b
+
 theorem34 : x .> y -> z .> u -> x*z .> y*u
 theorem34 {x} {y} {z} {u} x_gt_y z_gt_u =
     let xz_gt_yz = (fst (theorem32 {x=x} {y=y} {z=z})) x_gt_y in
@@ -192,3 +196,6 @@ theorem36 x_gte_y z_gte_u =
         (Left x_eq_y, Right z_gt_u) => greaterThanImpliesGTE $ theorem35 (Left (x_gte_y, z_gt_u))
         (Right x_gt_y, Left z_eq_u) => greaterThanImpliesGTE $ theorem35 (Right (x_gt_y, z_gte_u))
         (Right x_gt_y, Right z_gt_u) => greaterThanImpliesGTE $ theorem34 x_gt_y z_gt_u
+
+multiplyEquations : {a, b, x, y : PNat} -> a = b -> x = y -> a*x = b*y
+multiplyEquations Refl Refl = Refl
