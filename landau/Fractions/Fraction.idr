@@ -62,4 +62,8 @@ theorem39 (EquivalentCrossMultiply x_y) (EquivalentCrossMultiply y_z) = Equivale
     let prf6 = multRightCancel {x=(fst x)*(snd z)} {y=(fst z)*(snd x)} {z=(fst y)*(snd y)} prf5 in
     prf6
 
-theorem40 : (x_1, x_2) .~ (x_1 * z, x_2 * z)
+theorem40 : {x1, x2, z : PNat} -> (x1, x2) .~ (x1 * z, x2 * z)
+theorem40 {x1} {x2} {z} = EquivalentCrossMultiply $
+    let r1 = multCommutative {x=x2} {y=z} in
+    rewrite r1 in
+    sym (multAssociative {x=x1} {y=z} {z=x2})
