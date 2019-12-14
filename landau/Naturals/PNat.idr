@@ -12,6 +12,11 @@ data PNat : Type where
 
 %name PNat i, j, k, m, n
 
+
+axiom4 : PNat -> Boool -> Nat
+test n = Just 5
+
+
 ||| We always have x' != 1
 axiom3 : (x : PNat) -> (N x) = O -> Void
 axiom3 _ Refl impossible
